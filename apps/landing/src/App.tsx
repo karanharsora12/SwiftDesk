@@ -108,15 +108,15 @@ function App() {
       </div>
 
       {/* Floating Header */}
-      <div className="fixed top-0 left-0 w-full z-50 px-6 py-4">
-        <nav className="max-w-7xl mx-auto rounded-2xl bg-slate-900/40 backdrop-blur-xl border border-white/10 px-6 py-3 flex justify-between items-center shadow-2xl">
-          <div className="flex items-center gap-3">
+      <div className="fixed top-0 left-0 w-full z-50 px-4 sm:px-6 py-4">
+        <nav className="max-w-7xl mx-auto rounded-2xl bg-slate-900/40 backdrop-blur-xl border border-white/10 px-4 sm:px-6 py-3 flex justify-between items-center shadow-2xl">
+          <div className="flex items-center gap-2 sm:gap-3">
             <img
               src="/logo.png"
               alt="SwiftDesk Logo"
-              className="w-8 h-8 rounded-lg shadow-[0_0_15px_rgba(56,189,248,0.4)]"
+              className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg shadow-[0_0_15px_rgba(56,189,248,0.4)]"
             />
-            <span className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">
+            <span className="text-lg sm:text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">
               SwiftDesk
             </span>
           </div>
@@ -137,9 +137,10 @@ function App() {
           <a
             href={exeUrl}
             download="SwiftDesk Setup 0.1.0.exe"
-            className="px-5 py-2.5 rounded-xl bg-white text-slate-900 hover:bg-slate-200 text-sm font-bold transition-all shadow-[0_0_20px_rgba(255,255,255,0.2)]"
+            className="px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl bg-white text-slate-900 hover:bg-slate-200 text-xs sm:text-sm font-bold transition-all shadow-[0_0_20px_rgba(255,255,255,0.2)] whitespace-nowrap"
           >
-            Download Free
+            <span className="hidden sm:inline">Download Free</span>
+            <span className="sm:hidden">Download</span>
           </a>
         </nav>
       </div>
