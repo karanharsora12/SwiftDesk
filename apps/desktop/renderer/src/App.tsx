@@ -444,11 +444,6 @@ export function App(): JSX.Element {
             </section>
           </aside>
         </section>
-
-        <footer className="flex items-center justify-between border-t border-white/[0.07] pt-5 text-xs text-slate-500">
-          <span>Phase 3 · Signaling</span>
-          <span>Version {application.version}</span>
-        </footer>
       </div>
 
       {signaling.incomingRequest && (
