@@ -148,26 +148,26 @@ function App() {
         {/* Split Hero Section */}
         <section className="grid lg:grid-cols-2 gap-16 lg:gap-8 items-center mb-32">
           {/* Left Text Content */}
-          <div className="flex flex-col items-start text-left z-10">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold mb-8 backdrop-blur-md">
+          <div className="flex flex-col items-center lg:items-start text-center lg:text-left z-10 w-full mb-8 md:mb-0">
+            <div className="inline-flex items-center justify-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold mb-8 backdrop-blur-md">
               <span className="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
               SwiftDesk v0.1.0 is now live
             </div>
 
-            <h1 className="text-5xl md:text-[5rem] font-bold tracking-tight leading-[1.05] mb-6">
+            <h1 className="text-4xl sm:text-5xl md:text-[5rem] font-bold tracking-tight leading-[1.05] mb-6">
               <span className="block text-white">Remote Access,</span>
               <span className="block bg-clip-text text-transparent bg-gradient-to-r from-primary via-blue-400 to-violet-400">
                 Without Limits.
               </span>
             </h1>
 
-            <p className="text-lg md:text-xl text-slate-400 mb-10 max-w-xl leading-relaxed">
+            <p className="text-lg md:text-xl text-slate-400 mb-10 max-w-xl leading-relaxed mx-auto lg:mx-0">
               Experience zero-latency connections and crystal-clear screen
               sharing. Native Windows integration powered by next-gen WebRTC
               technology.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
+            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 w-full sm:w-auto">
               <a
                 href={exeUrl}
                 download="SwiftDesk Setup 0.1.0.exe"
@@ -181,11 +181,11 @@ function App() {
               </a> */}
             </div>
 
-            <div className="mt-8 flex items-center gap-6 text-sm text-slate-500 font-medium">
-              <div className="flex items-center gap-2">
+            <div className="mt-8 flex flex-wrap justify-center lg:justify-start items-center gap-4 sm:gap-6 text-sm text-slate-500 font-medium w-full">
+              <div className="flex items-center gap-2 whitespace-nowrap">
                 <ZapIcon /> 60fps Streaming
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 whitespace-nowrap">
                 <ShieldIcon /> E2E Encrypted
               </div>
             </div>
@@ -207,7 +207,7 @@ function App() {
                   <div className="w-3 h-3 rounded-full bg-amber-500"></div>
                   <div className="w-3 h-3 rounded-full bg-emerald-500"></div>
                   <div className="mx-auto text-xs font-medium text-slate-400 pr-10">
-                    SwiftDesk UI
+                    SwiftDesk
                   </div>
                 </div>
                 <div className="p-8 pb-12 flex flex-col items-center bg-gradient-to-b from-transparent to-slate-950/50">
@@ -265,27 +265,35 @@ function App() {
               </div>
 
               {/* Floating Element 1 */}
-              <div className="absolute -left-12 top-1/4 bg-slate-800/80 backdrop-blur-xl border border-white/10 p-3 rounded-xl shadow-xl flex items-center gap-3 animate-blob">
-                <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400">
+              <div className="absolute left-2 sm:-left-12 top-1/4 bg-slate-800/80 backdrop-blur-xl border border-white/10 p-2 sm:p-3 rounded-xl shadow-xl flex items-center gap-2 sm:gap-3 animate-blob scale-75 sm:scale-100 origin-left">
+                <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400">
                   <ShieldIcon />
                 </div>
                 <div className="pr-2">
-                  <p className="text-xs text-slate-400">Connection</p>
-                  <p className="text-sm font-bold text-white">Encrypted</p>
+                  <p className="text-[10px] sm:text-xs text-slate-400">
+                    Connection
+                  </p>
+                  <p className="text-xs sm:text-sm font-bold text-white">
+                    Encrypted
+                  </p>
                 </div>
               </div>
 
               {/* Floating Element 2 */}
               <div
-                className="absolute -right-8 bottom-1/4 bg-slate-800/80 backdrop-blur-xl border border-white/10 p-3 rounded-xl shadow-xl flex items-center gap-3 animate-blob"
+                className="absolute right-2 sm:-right-8 bottom-1/4 bg-slate-800/80 backdrop-blur-xl border border-white/10 p-2 sm:p-3 rounded-xl shadow-xl flex items-center gap-2 sm:gap-3 animate-blob scale-75 sm:scale-100 origin-right"
                 style={{ animationDelay: "2s" }}
               >
-                <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary">
+                <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary">
                   <ZapIcon />
                 </div>
                 <div className="pr-2">
-                  <p className="text-xs text-slate-400">Latency</p>
-                  <p className="text-sm font-bold text-white">~12ms</p>
+                  <p className="text-[10px] sm:text-xs text-slate-400">
+                    Latency
+                  </p>
+                  <p className="text-xs sm:text-sm font-bold text-white">
+                    ~12ms
+                  </p>
                 </div>
               </div>
             </div>
@@ -368,7 +376,7 @@ function App() {
             <div className="absolute bottom-0 left-0 w-[50%] h-[100%] bg-violet-600/10 blur-[100px] rounded-full group-hover:bg-violet-600/20 transition-colors duration-700"></div>
 
             <div className="relative z-10">
-              <h2 className="text-4xl md:text-6xl font-bold text-white mb-6 tracking-tight">
+              <h2 className="text-3xl sm:text-4xl md:text-6xl font-bold text-white mb-6 tracking-tight">
                 Ready for a faster desktop?
               </h2>
               <p className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto mb-10">
