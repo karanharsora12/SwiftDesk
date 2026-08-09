@@ -25,11 +25,24 @@ export class WebRTCService {
     this.closeConnection()
     this.peer = new RTCPeerConnection({ iceServers: [{ urls: this.stunServer }] })
     this.peer.onicecandidate = ({ candidate }) => { if (candidate && candidate.candidate) { this.debug('ICE candidate generated'); this.callbacks.onIceCandidate({ candidate: candidate.candidate, sdpMid: candidate.sdpMid, sdpMLineIndex: candidate.sdpMLineIndex }) } }
-    this.peer.ontrack = ({ track, streams }) => { this.debug('Remote track received', { kind: track.kind }); if (streams[0]) this.callbacks.onRemoteStream(streams[0]) }
+    this.peer.ontrack = ({ track, streams }) => { 
+      this.debug('Remote track received', { kind: track.kind }); 
+      if (streams && streams[0]) {
+        this.callbacks.onRemoteStream(streams[0]);
+      } else {
+        const newStream = new MediaStream([track]);
+        this.callbacks.onRemoteStream(newStream);
+      }
+    }
     this.peer.onconnectionstatechange = () => { this.debug('Connection state', { connection: this.peer?.connectionState, ice: this.peer?.iceConnectionState, signaling: this.peer?.signalingState }); this.callbacks.onStatus(this.mapState(this.peer?.connectionState)) }
     this.peer.ondatachannel = ({ channel }) => { this.debug('DataChannel received', { label: channel.label }); if (channel.label === 'swiftdesk-control') { this.controlChannel = channel; this.callbacks.onControlChannel(channel) } }
     if (localStream) { this.stream = localStream; this.debug('Adding media tracks', { tracks: localStream.getTracks().map((track) => `${track.kind}:${track.readyState}`) }); localStream.getTracks().forEach((track) => this.peer?.addTrack(track, localStream)); this.debug('Video track added', { senders: this.peer.getSenders().map((sender) => sender.track?.kind) }) }
-    if (role === 'controller') { this.controlChannel = this.peer.createDataChannel('swiftdesk-control', { ordered: true }); this.debug('DataChannel created'); this.callbacks.onControlChannel(this.controlChannel) }
+    if (role === 'controller') { 
+      this.peer.addTransceiver('video', { direction: 'recvonly' });
+      this.controlChannel = this.peer.createDataChannel('swiftdesk-control', { ordered: true }); 
+      this.debug('DataChannel created'); 
+      this.callbacks.onControlChannel(this.controlChannel) 
+    }
   }
 
   async createOffer(): Promise<void> { if (!this.peer) return; this.debug('Creating offer'); const offer = await this.peer.createOffer(); await this.peer.setLocalDescription(offer); this.debug('Offer sent'); this.callbacks.onOffer({ type: offer.type, sdp: offer.sdp }) }

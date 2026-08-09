@@ -3,6 +3,7 @@ import { is } from "@electron-toolkit/utils";
 import { join } from "node:path";
 import { IPC_CHANNELS } from "../../shared/ipc";
 import { DeviceIdentityService } from "./services/device-identity-service";
+import { WindowsInputController } from "./services/nativeInput/windows/WindowsInputController";
 
 if (process.env.SWIFT_DESK_INSTANCE) {
   app.setPath(
@@ -101,7 +102,7 @@ function registerIpcHandlers(): void {
       selectedScreenSourceId = sourceId;
     },
   );
-  const inputController = new (require("./services/nativeInput/windows/WindowsInputController").WindowsInputController)();
+  const inputController = new WindowsInputController();
 
   ipcMain.handle(IPC_CHANNELS.sendRemoteInput, async (_event, input: any) => {
     try {

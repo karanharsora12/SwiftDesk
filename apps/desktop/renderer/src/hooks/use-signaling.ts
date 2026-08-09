@@ -44,6 +44,7 @@ export function useSignaling(device: DeviceIdentity | null, uiCallbacks?: Signal
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [controlEnabled, setControlEnabled] = useState<boolean>(false);
   const rtc = useRef<WebRTCService | null>(null);
+  const iceBuffer = useRef<any[]>([]);
   const capture = useRef(new ScreenCaptureService());
   const remoteControl = useRef<RemoteControlService | null>(null);
   
@@ -132,7 +133,11 @@ export function useSignaling(device: DeviceIdentity | null, uiCallbacks?: Signal
         void rtc.current?.acceptAnswer(signal.sdp);
       },
       onIce: (signal) => {
-        void rtc.current?.addIceCandidate(signal.candidate);
+        if (rtc.current) {
+          void rtc.current.addIceCandidate(signal.candidate);
+        } else {
+          iceBuffer.current.push(signal.candidate);
+        }
       },
       onControlRequest: (signal) => {
         if (callbacksRef.current?.onRequireControlApproval) {
@@ -207,6 +212,10 @@ export function useSignaling(device: DeviceIdentity | null, uiCallbacks?: Signal
           const peer = createRtc(targetSessionId);
           await peer.start("host", stream);
           await peer.acceptOffer(sdp);
+          const buffered = iceBuffer.current.splice(0, iceBuffer.current.length);
+          for (const cand of buffered) {
+            await peer.addIceCandidate(cand);
+          }
         } catch (e) {
           setSessionMessage(e instanceof Error ? `Failed to share screen: ${e.message}` : "Failed to share screen");
         }

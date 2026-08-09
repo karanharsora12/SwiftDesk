@@ -80,7 +80,8 @@ export function RemoteSessionPage({ stream, onDisconnect, onRequestControl, send
         <video 
           ref={video} 
           autoPlay 
-          playsInline 
+          playsInline
+          muted 
           className="h-full w-full object-contain cursor-crosshair focus:outline-none" 
           tabIndex={0}
           onMouseMove={handleMouseMove}
