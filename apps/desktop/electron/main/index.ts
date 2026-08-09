@@ -4,6 +4,8 @@ import { join } from "node:path";
 import { IPC_CHANNELS } from "../../shared/ipc";
 import { DeviceIdentityService } from "./services/device-identity-service";
 import { WindowsInputController } from "./services/nativeInput/windows/WindowsInputController";
+// @ts-ignore
+import icon from "../../resources/icon.ico?asset";
 
 if (process.env.SWIFT_DESK_INSTANCE) {
   app.setPath(
@@ -21,6 +23,7 @@ let selectedScreenSourceId: string | undefined;
 
 function createWindow(): void {
   mainWindow = new BrowserWindow({
+    icon,
     width: 1240,
     height: 800,
     minWidth: 1024,

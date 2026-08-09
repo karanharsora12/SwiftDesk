@@ -17,5 +17,9 @@
   "engines": {
     "node": ">=20.19.0",
     "npm": ">=10.0.0"
+  },
+  "devDependencies": {
+    "jimp": "^0.16.13",
+    "png-to-ico": "^3.0.2"
   }
 }

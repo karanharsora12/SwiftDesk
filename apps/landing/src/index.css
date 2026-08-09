@@ -1,0 +1,33 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: #090e17;
+  --color-primary: #38bdf8;
+  --color-primary-hover: #0ea5e9;
+  
+  --font-sans: 'Outfit', sans-serif;
+  
+  --animate-float: float 6s ease-in-out infinite;
+  
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
+  }
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-slate-100);
+}
+
+/* Custom utility for the glowing grid background */
+.bg-grid-pattern {
+  background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 30px 30px;
+}

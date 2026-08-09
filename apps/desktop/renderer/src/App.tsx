@@ -20,6 +20,7 @@ import {
   Wifi,
   MousePointer2,
 } from "lucide-react";
+import iconUrl from "../../resources/icon.png";
 
 interface ApplicationInfo {
   name: string;
@@ -197,13 +198,11 @@ export function App(): JSX.Element {
       <div className="mx-auto flex min-h-screen max-w-[1440px] flex-col px-6 py-6 lg:px-10">
         <header className="flex items-center justify-between border-b border-white/[0.07] pb-6">
           <div className="flex items-center gap-3">
-            <div className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-sky-300 to-blue-600 shadow-glow">
-              <MonitorUp
-                size={21}
-                strokeWidth={2.4}
-                className="text-slate-950"
-              />
-            </div>
+            <img
+              src={iconUrl}
+              alt="SwiftDesk Logo"
+              className="h-10 w-10 rounded-xl shadow-glow"
+            />
             <div>
               <p className="text-lg font-semibold tracking-tight">
                 {application.name}
@@ -629,13 +628,13 @@ export function App(): JSX.Element {
                 You are securely sharing your screen.
               </p>
             </div>
-            <button
-              className="primary-button bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700 shadow-none py-1.5 px-3 h-auto whitespace-nowrap"
-              onClick={signaling.disconnectSession}
-            >
-              Stop Sharing
-            </button>
           </div>
+          <button
+            className="primary-button bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700 shadow-none py-1.5 px-3 h-auto whitespace-nowrap"
+            onClick={signaling.disconnectSession}
+          >
+            Stop Sharing
+          </button>
         </div>
       )}
     </main>
