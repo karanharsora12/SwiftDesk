@@ -25,9 +25,6 @@ import { logger } from "./utils/logger";
 
 const app = express();
 const httpServer = createServer(app);
-const acceptedOrigins = new Set(
-  env.CLIENT_ORIGIN.split(",").map((origin) => origin.trim()),
-);
 
 app.disable("x-powered-by");
 app.use(helmet());
@@ -93,14 +90,6 @@ const sessionManager = new SessionManager(
   },
 );
 
-io.use((socket, next) => {
-  const origin = socket.handshake.headers.origin;
-  if (origin && !acceptedOrigins.has(origin))
-    return next(new Error("Origin is not allowed."));
-
-  next();
-});
-
 io.on("connection", (socket) => {
   registerSocketHandlers(socket, {
     io,
@@ -115,13 +104,3 @@ httpServer.listen(env.PORT, () => {
     `SwiftDesk signaling server running on port ${env.PORT}`,
   );
 });
-
-function createOriginValidator(): (
-  origin: string | undefined,
-  callback: (error: Error | null, allow?: boolean) => void,
-) => void {
-  return (origin, callback) => {
-    if (!origin || acceptedOrigins.has(origin)) return callback(null, true);
-    callback(new Error("Origin is not allowed."));
-  };
-}
