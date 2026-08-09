@@ -42,7 +42,6 @@ app.use(
   }),
 );
 
-
 app.get("/health", (_request: Request, response: Response) => {
   response.status(200).json({ status: "ok", service: "swiftdesk-signaling" });
 });
@@ -76,7 +75,7 @@ const io = new Server<
   SocketData
 >(httpServer, {
   cors: {
-    origin: createOriginValidator(),
+    origin: "*",
     methods: ["GET", "POST"],
     credentials: false,
   },
