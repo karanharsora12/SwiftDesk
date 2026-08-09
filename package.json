@@ -1,0 +1,21 @@
+{
+  "name": "swiftdesk",
+  "version": "0.1.0",
+  "private": true,
+  "description": "SwiftDesk remote desktop application",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=@swiftdesk/desktop",
+    "build": "npm run build --workspace=@swiftdesk/desktop",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "package:win": "npm run package:win --workspace=@swiftdesk/desktop"
+  },
+  "engines": {
+    "node": ">=20.19.0",
+    "npm": ">=10.0.0"
+  }
+}
