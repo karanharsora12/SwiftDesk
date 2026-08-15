@@ -144,7 +144,44 @@ export function RemoteSessionPage({
           </span>
         </div>
 
-        <div className="flex shrink-0 items-center gap-2">
+        <div className="flex shrink-0 items-center gap-3">
+          <span
+            className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] font-semibold ${
+              controlEnabled
+                ? "bg-rose-500/[0.12] text-rose-300"
+                : "bg-sky-400/[0.12] text-sky-300"
+            }`}
+          >
+            <span
+              className={`h-1.5 w-1.5 rounded-full ${
+                controlEnabled ? "bg-rose-400" : "bg-sky-400"
+              } animate-pulse`}
+            />
+            {controlEnabled ? "Controlling" : "Viewing"}
+          </span>
+
+          {controlEnabled ? (
+            <Button
+              className="flex items-center gap-2 rounded-xl px-3 py-1.5 text-xs font-medium text-slate-200 transition-colors hover:bg-white/[0.06] hover:text-white"
+              onClick={() => revokeControl(sessionId)}
+              title="Release remote control"
+            >
+              <MousePointerClick size={14} className="text-rose-400" />
+              Release Control
+            </Button>
+          ) : (
+            <Button
+              className="flex items-center gap-2 rounded-xl px-3 py-1.5 text-xs font-medium text-slate-200 transition-colors hover:bg-white/[0.06] hover:text-white"
+              onClick={onRequestControl}
+              title="Request control of the remote device"
+            >
+              <Unlock size={14} className="text-sky-400" />
+              Request Control
+            </Button>
+          )}
+
+          <div className="h-5 w-px bg-white/10" />
+
           <Button
             variant="icon"
             className="h-9 w-9"
@@ -153,8 +190,8 @@ export function RemoteSessionPage({
           >
             {isFullscreen ? <Minimize size={16} /> : <Maximize size={16} />}
           </Button>
-          <Button variant="danger" className="px-4 py-2" onClick={onDisconnect}>
-            <PhoneOff size={16} /> Disconnect
+          <Button variant="danger" className="px-4 py-1.5 text-xs" onClick={onDisconnect}>
+            <PhoneOff size={14} /> Disconnect
           </Button>
         </div>
       </header>
@@ -178,62 +215,7 @@ export function RemoteSessionPage({
             onContextMenu={(e) => e.preventDefault()}
           />
 
-          {/* Viewing badge */}
-          {!controlEnabled && (
-            <div className="pointer-events-none absolute left-1/2 top-3 flex -translate-x-1/2 items-center gap-2 rounded-full border border-white/10 bg-slate-900/85 px-3 py-1.5 text-[11px] font-medium text-slate-200 backdrop-blur-xl">
-              <Lock size={12} className="text-slate-400" />
-              Viewing only — request control to interact
-            </div>
-          )}
 
-          {/* Floating control toolbar */}
-          <div className="pointer-events-none absolute inset-x-0 bottom-3 flex justify-center px-3">
-            <div className="pointer-events-auto flex items-center gap-1 rounded-2xl border border-white/10 bg-slate-900/85 p-1.5 shadow-2xl backdrop-blur-xl">
-              <span
-                className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] font-semibold ${
-                  controlEnabled
-                    ? "bg-rose-500/[0.12] text-rose-300"
-                    : "bg-sky-400/[0.12] text-sky-300"
-                }`}
-              >
-                <span
-                  className={`h-1.5 w-1.5 rounded-full ${
-                    controlEnabled ? "bg-rose-400" : "bg-sky-400"
-                  } animate-pulse`}
-                />
-                {controlEnabled ? "Controlling" : "Viewing"}
-              </span>
-              <span className="mx-1 h-5 w-px bg-white/10" />
-              {controlEnabled ? (
-                <Button
-                  className="flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-medium text-slate-200 transition-colors hover:bg-white/[0.06] hover:text-white"
-                  onClick={() => revokeControl(sessionId)}
-                  title="Release remote control"
-                >
-                  <MousePointerClick size={14} className="text-rose-400" />
-                  Release Control
-                </Button>
-              ) : (
-                <Button
-                  className="flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-medium text-slate-200 transition-colors hover:bg-white/[0.06] hover:text-white"
-                  onClick={onRequestControl}
-                  title="Request control of the remote device"
-                >
-                  <Unlock size={14} className="text-sky-400" />
-                  Request Control
-                </Button>
-              )}
-              <span className="mx-1 h-5 w-px bg-white/10" />
-              <Button
-                className="flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-medium text-rose-300 transition-colors hover:bg-rose-500/[0.15] hover:text-rose-200"
-                onClick={onDisconnect}
-                title="End the session"
-              >
-                <PhoneOff size={14} />
-                End
-              </Button>
-            </div>
-          </div>
 
           {/* Mouse pointer overlay when viewing */}
           {!controlEnabled && (
