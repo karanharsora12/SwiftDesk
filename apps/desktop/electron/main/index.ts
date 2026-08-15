@@ -7,6 +7,10 @@ import { WindowsInputController } from "./services/nativeInput/windows/WindowsIn
 // @ts-ignore
 import icon from "../../resources/icon.ico?asset";
 
+app.commandLine.appendSwitch("disable-renderer-backgrounding");
+app.commandLine.appendSwitch("disable-background-timer-throttling");
+app.commandLine.appendSwitch("disable-features", "CalculateNativeWinOcclusion");
+
 if (process.env.SWIFT_DESK_INSTANCE) {
   app.setPath(
     "userData",
