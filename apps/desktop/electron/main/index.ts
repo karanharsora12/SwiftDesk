@@ -87,11 +87,19 @@ function registerIpcHandlers(): void {
       types: ["screen", "window"],
       thumbnailSize: { width: 320, height: 180 },
     });
-    return sources.map((source) => ({
-      id: source.id,
-      name: source.name,
-      thumbnail: source.thumbnail.toDataURL(),
-    }));
+    return sources.map((source) => {
+      let name = source.name;
+      if (source.id.startsWith("screen:")) {
+        name = name.toLowerCase() === "entire screen" 
+          ? "Entire Screen" 
+          : name.replace(/^Screen/i, "Entire Screen");
+      }
+      return {
+        id: source.id,
+        name,
+        thumbnail: source.thumbnail.toDataURL(),
+      };
+    });
   });
   ipcMain.handle(
     IPC_CHANNELS.selectScreenSource,

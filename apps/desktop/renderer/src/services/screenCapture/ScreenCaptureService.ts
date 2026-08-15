@@ -6,11 +6,20 @@ export class ScreenCaptureService {
     await window.swiftDesk.selectScreenSource(sourceId)
     let stream: MediaStream
     try {
-      stream = await navigator.mediaDevices.getDisplayMedia({ audio: false, video: { frameRate: { ideal: 30, max: 30 } } })
+      // Use getUserMedia with chromeMediaSource for stable capture in Electron
+      stream = await navigator.mediaDevices.getUserMedia({
+        audio: false,
+        video: {
+          mandatory: {
+            chromeMediaSource: 'desktop',
+            chromeMediaSourceId: sourceId,
+          }
+        } as any
+      });
     } catch (error: unknown) {
-      const message = error instanceof DOMException ? `${error.name}: ${error.message}` : 'Unknown display-capture error'
-      console.error('[ScreenCapture] getDisplayMedia failed', message)
-      throw new Error(message)
+      const message = error instanceof DOMException ? `${error.name}: ${error.message}` : 'Unknown display-capture error';
+      console.error('[ScreenCapture] getUserMedia failed', message);
+      throw new Error(message);
     }
     if (import.meta.env.DEV) console.debug('[ScreenCapture] Stream created', { tracks: stream.getTracks().length, videoTracks: stream.getVideoTracks().length, live: stream.getVideoTracks()[0]?.readyState === 'live' })
     return stream

@@ -552,23 +552,60 @@ export function App(): JSX.Element {
             <p className="mt-2 text-sm text-slate-300">
               Select a screen or window to share with the remote device.
             </p>
-            <div className="mt-5 grid grid-cols-2 gap-4 overflow-y-auto sm:grid-cols-3">
-              {screenPicker.sources.map((source) => (
-                <Button
-                  key={source.id}
-                  onClick={() => handleSelectScreen(source.id)}
-                  className="flex flex-col items-center gap-3 rounded-xl border border-white/[0.08] bg-white/[0.02] p-3 transition-all hover:border-white/[0.15] hover:bg-white/[0.05]"
-                >
-                  <img
-                    src={source.thumbnail}
-                    alt={source.name}
-                    className="aspect-video w-full rounded-lg border border-white/[0.1] bg-black/40 object-contain"
-                  />
-                  <span className="mt-1 w-full truncate text-center text-sm font-medium text-slate-100">
-                    {source.name}
-                  </span>
-                </Button>
-              ))}
+            <div className="mt-5 flex min-h-0 flex-col gap-6 overflow-y-auto pr-2">
+              {/* Screens Section */}
+              <div>
+                <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
+                  Screens
+                </h3>
+                <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+                  {screenPicker.sources
+                    .filter((s) => s.id.startsWith("screen:"))
+                    .map((source) => (
+                      <Button
+                        key={source.id}
+                        onClick={() => handleSelectScreen(source.id)}
+                        className="flex flex-col items-center gap-3 rounded-xl border border-white/[0.08] bg-white/[0.02] p-3 transition-all hover:border-white/[0.15] hover:bg-white/[0.05]"
+                      >
+                        <img
+                          src={source.thumbnail}
+                          alt={source.name}
+                          className="aspect-video w-full rounded-lg border border-white/[0.1] bg-black/40 object-contain"
+                        />
+                        <span className="w-full truncate text-center text-sm font-medium text-slate-100" title={source.name || "Entire Screen"}>
+                          {source.name || "Entire Screen"}
+                        </span>
+                      </Button>
+                    ))}
+                </div>
+              </div>
+
+              {/* Windows Section */}
+              <div>
+                <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
+                  Windows
+                </h3>
+                <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+                  {screenPicker.sources
+                    .filter((s) => s.id.startsWith("window:"))
+                    .map((source) => (
+                      <Button
+                        key={source.id}
+                        onClick={() => handleSelectScreen(source.id)}
+                        className="flex flex-col items-center gap-3 rounded-xl border border-white/[0.08] bg-white/[0.02] p-3 transition-all hover:border-white/[0.15] hover:bg-white/[0.05]"
+                      >
+                        <img
+                          src={source.thumbnail}
+                          alt={source.name}
+                          className="aspect-video w-full rounded-lg border border-white/[0.1] bg-black/40 object-contain"
+                        />
+                        <span className="w-full truncate text-center text-sm font-medium text-slate-100" title={source.name || "Window"}>
+                          {source.name || "Window"}
+                        </span>
+                      </Button>
+                    ))}
+                </div>
+              </div>
             </div>
             <div className="mt-6 flex justify-end border-t border-white/[0.06] pt-4">
               <Button
