@@ -262,36 +262,7 @@ const ActivityIcon = () => (
   </svg>
 );
 
-const MouseIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="6" y="3" width="12" height="18" rx="6"></rect>
-    <line x1="12" y1="7" x2="12" y2="11"></line>
-  </svg>
-);
 
-const KeyboardIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="2" y="6" width="20" height="12" rx="2"></rect>
-    <path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M6 14h.01M18 14h.01M9 14h6"></path>
-  </svg>
-);
-
-const ClipboardIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="8" y="2" width="8" height="4" rx="1"></rect>
-    <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
-    <line x1="9" y1="12" x2="15" y2="12"></line>
-  </svg>
-);
-
-const FullscreenIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M8 3H5a2 2 0 0 0-2 2v3"></path>
-    <path d="M21 8V5a2 2 0 0 0-2-2h-3"></path>
-    <path d="M3 16v3a2 2 0 0 0 2 2h3"></path>
-    <path d="M16 21h3a2 2 0 0 0 2-2v-3"></path>
-  </svg>
-);
 
 /* --------------------------- Hooks --------------------------- */
 function useReveal<T extends HTMLElement>() {
