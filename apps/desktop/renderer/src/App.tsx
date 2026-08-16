@@ -22,6 +22,7 @@ import { RemoteSessionPage } from "./components/RemoteSessionPage";
 import { useSignaling } from "./hooks/use-signaling";
 import type { ScreenSource } from "./services/screenCapture/ScreenCaptureService";
 import { Button } from "./components/Button";
+import { SettingsLayout } from "./components/settings/SettingsLayout";
 
 interface ApplicationInfo {
   name: string;
@@ -30,24 +31,28 @@ interface ApplicationInfo {
 
 const quickActions = [
   {
+    id: "share",
     icon: MonitorUp,
     title: "Share my screen",
-    detail: "Start a secure support session",
+    detail: "Copy your ID to share",
     accent: "bg-sky-400/10 text-sky-300",
   },
   {
+    id: "connect",
     icon: ArrowRight,
     title: "Connect to device",
     detail: "Enter an ID to request access",
     accent: "bg-violet-400/10 text-violet-300",
   },
   {
+    id: "recent",
     icon: Clock3,
     title: "Recent sessions",
     detail: "Your connection history",
     accent: "bg-amber-400/10 text-amber-300",
   },
   {
+    id: "settings",
     icon: SlidersHorizontal,
     title: "Settings",
     detail: "Security and preferences",
@@ -71,6 +76,7 @@ export function App(): JSX.Element {
   const [copied, setCopied] = useState(false);
   const [isRegenerating, setIsRegenerating] = useState(false);
   const [identityError, setIdentityError] = useState<string | null>(null);
+  const [showSettings, setShowSettings] = useState(false);
 
   // Modals state
   const [screenPicker, setScreenPicker] = useState<{
@@ -179,6 +185,23 @@ export function App(): JSX.Element {
     setControlRequest(null);
   };
 
+  const handleQuickAction = (id: string) => {
+    switch (id) {
+      case "share":
+        void handleCopy();
+        break;
+      case "connect":
+        document.getElementById("remote-id")?.focus();
+        break;
+      case "recent":
+        setShowSettings(true);
+        break;
+      case "settings":
+        setShowSettings(true);
+        break;
+    }
+  };
+
   const isServerOnline = signaling.status === "online";
   const statusLabel =
     signaling.status === "online"
@@ -200,17 +223,17 @@ export function App(): JSX.Element {
     );
 
   return (
-    <main className="h-screen overflow-hidden bg-[#09111f] text-slate-100 selection:bg-sky-400/30">
+    <main className="h-screen overflow-hidden bg-slate-50 dark:bg-[#09111f] text-slate-900 dark:text-slate-100 selection:bg-sky-400/30">
       <div className="mx-auto flex h-full max-w-[1680px] flex-col px-4 py-5 sm:px-6 lg:px-8">
-        <header className="flex items-center justify-between border-b border-white/[0.06] pb-4">
+        <header className="flex items-center justify-between border-b border-slate-200 dark:border-white/[0.06] pb-4">
           <div className="flex items-center gap-3">
             <img
               src={iconUrl}
               alt="SwiftDesk Logo"
-              className="h-10 w-10 rounded-xl border border-white/[0.08]"
+              className="h-10 w-10 rounded-xl border border-slate-200 dark:border-white/[0.08]"
             />
             <div>
-              <p className="text-lg font-semibold tracking-tight text-white">
+              <p className="text-lg font-semibold tracking-tight text-slate-900 dark:text-white">
                 {application.name}
               </p>
               <p className="text-xs text-slate-400">
@@ -237,6 +260,7 @@ export function App(): JSX.Element {
               variant="icon"
               className="h-10 w-10"
               aria-label="Open settings"
+              onClick={() => setShowSettings(true)}
             >
               <Settings size={18} />
             </Button>
@@ -262,10 +286,10 @@ export function App(): JSX.Element {
                     <div className="eyebrow">
                       <Wifi size={13} /> MY DEVICE
                     </div>
-                    <h1 className="mt-2 text-2xl font-bold tracking-tight text-white">
+                    <h1 className="mt-2 text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
                       Ready when you are.
                     </h1>
-                    <p className="mt-1.5 text-sm text-slate-300">
+                    <p className="mt-1.5 text-sm text-slate-600 dark:text-slate-300">
                       Your local device identity is ready for secure
                       connections.
                     </p>
@@ -286,12 +310,12 @@ export function App(): JSX.Element {
                   </span>
                 </div>
 
-                <div className="rounded-2xl border border-dashed border-sky-300/20 bg-slate-950/25 px-6 py-5 sm:px-7">
-                  <p className="text-xs font-medium uppercase tracking-[0.14em] text-slate-400">
+                <div className="rounded-2xl border border-dashed border-slate-300 dark:border-sky-300/20 bg-slate-100/50 dark:bg-slate-950/25 px-6 py-5 sm:px-7">
+                  <p className="text-xs font-medium uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">
                     Your SwiftDesk ID
                   </p>
                   <div className="mt-2.5 flex flex-wrap items-center justify-between gap-3">
-                    <p className="text-2xl font-bold tracking-[0.14em] text-slate-100 sm:text-3xl">
+                    <p className="text-2xl font-bold tracking-[0.14em] text-slate-900 dark:text-slate-100 sm:text-3xl">
                       {deviceIdentity
                         ? formatId(deviceIdentity.id)
                         : "Loading..."}
@@ -321,26 +345,26 @@ export function App(): JSX.Element {
                 </div>
 
                 <div className="flex flex-col gap-3">
-                  <div className="flex items-center gap-2.5 text-sm text-slate-300">
-                    <Laptop size={17} className="text-sky-300 shrink-0" />
+                  <div className="flex items-center gap-2.5 text-sm text-slate-600 dark:text-slate-300">
+                    <Laptop size={17} className="text-sky-500 dark:text-sky-300 shrink-0" />
                     <span className="truncate">
                       {deviceIdentity?.name ?? "Loading device name..."}
                     </span>
-                    <span className="ml-auto text-xs text-slate-400 shrink-0">
+                    <span className="ml-auto text-xs text-slate-500 dark:text-slate-400 shrink-0">
                       Stored on this device
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-2 text-xs text-slate-400">
+                  <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
                     <Wifi
                       size={14}
-                      className={`shrink-0 ${isServerOnline ? "text-emerald-400" : "text-slate-400"}`}
+                      className={`shrink-0 ${isServerOnline ? "text-emerald-500 dark:text-emerald-400" : "text-slate-400"}`}
                     />
                     <span className="truncate">
                       Connection server:{" "}
                       <span
                         className={
-                          isServerOnline ? "text-emerald-400 font-medium" : "text-slate-400"
+                          isServerOnline ? "text-emerald-600 dark:text-emerald-400 font-medium" : "text-slate-500 dark:text-slate-400"
                         }
                       >
                         {isServerOnline ? "Connected" : statusLabel}
@@ -365,10 +389,10 @@ export function App(): JSX.Element {
               <div className="eyebrow">
                 <ArrowRight size={13} /> CONNECT
               </div>
-              <h2 className="mt-2 text-xl font-semibold tracking-tight text-white">
+              <h2 className="mt-2 text-xl font-semibold tracking-tight text-slate-900 dark:text-white">
                 Connect to another device
               </h2>
-              <p className="mt-1.5 text-sm text-slate-300">
+              <p className="mt-1.5 text-sm text-slate-600 dark:text-slate-300">
                 Enter a SwiftDesk ID to request a secure session.
               </p>
               <form
@@ -404,14 +428,14 @@ export function App(): JSX.Element {
                   Connect <ChevronRight size={17} />
                 </Button>
               </form>
-              <p className="mt-3 text-xs text-slate-400">
+              <p className="mt-3 text-xs text-slate-500 dark:text-slate-400">
                 {isServerOnline
                   ? "A remote device must approve every connection request."
                   : "Start the signaling server to connect to another device."}
               </p>
               {signaling.sessionMessage && (
                 <p
-                  className="mt-3 rounded-xl border border-sky-400/20 bg-sky-400/[0.09] px-3 py-2 text-sm text-sky-100"
+                  className="mt-3 rounded-xl border border-sky-500/20 dark:border-sky-400/20 bg-sky-50 dark:bg-sky-400/[0.09] px-3 py-2 text-sm text-sky-700 dark:text-sky-100"
                   role="status"
                 >
                   {signaling.sessionMessage}
@@ -428,17 +452,18 @@ export function App(): JSX.Element {
                   <div className="eyebrow">
                     <Plus size={13} /> QUICK ACTIONS
                   </div>
-                  <p className="mt-1.5 text-sm text-slate-300">
+                  <p className="mt-1.5 text-sm text-slate-600 dark:text-slate-300">
                     Everything you need, close at hand.
                   </p>
                 </div>
-                <MoreHorizontal size={20} className="text-slate-500" />
+                <MoreHorizontal size={20} className="text-slate-400 dark:text-slate-500" />
               </div>
               <div className="mt-4 grid gap-2">
-                {quickActions.map(({ icon: Icon, title, detail, accent }) => (
+                {quickActions.map(({ id, icon: Icon, title, detail, accent }) => (
                   <Button
-                    key={title}
-                    className="group flex items-center gap-3 rounded-xl border border-transparent p-3 text-left transition-colors hover:border-white/[0.08] hover:bg-white/[0.04]"
+                    key={id}
+                    onClick={() => handleQuickAction(id)}
+                    className="group flex items-center gap-3 rounded-xl border border-transparent p-3 text-left transition-colors hover:border-slate-200 dark:hover:border-white/[0.08] hover:bg-slate-50 dark:hover:bg-white/[0.04]"
                   >
                     <span
                       className={`grid h-9 w-9 shrink-0 place-items-center rounded-lg ${accent}`}
@@ -446,16 +471,16 @@ export function App(): JSX.Element {
                       <Icon size={16} />
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block text-sm font-medium text-slate-200">
+                      <span className="block text-sm font-medium text-slate-800 dark:text-slate-200">
                         {title}
                       </span>
-                      <span className="mt-0.5 block text-xs text-slate-400">
+                      <span className="mt-0.5 block text-xs text-slate-500 dark:text-slate-400">
                         {detail}
                       </span>
                     </span>
                     <ChevronRight
                       size={16}
-                      className="text-slate-600 transition-colors group-hover:text-slate-300"
+                      className="text-slate-400 dark:text-slate-600 transition-colors group-hover:text-slate-700 dark:group-hover:text-slate-300"
                     />
                   </Button>
                 ))}
@@ -463,14 +488,14 @@ export function App(): JSX.Element {
             </section>
 
             {/* Security */}
-            <section className="shrink-0 rounded-2xl border border-sky-400/20 bg-gradient-to-br from-sky-400/[0.08] to-transparent p-5">
+            <section className="shrink-0 rounded-2xl border border-sky-500/20 dark:border-sky-400/20 bg-gradient-to-br from-sky-50 dark:from-sky-400/[0.08] to-transparent p-5">
               <div className="flex items-start gap-3">
-                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-sky-400/15 text-sky-300">
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-sky-100/50 dark:bg-sky-400/15 text-sky-600 dark:text-sky-300">
                   <ShieldCheck size={20} />
                 </span>
                 <div>
-                  <h2 className="font-semibold text-white">Secure by design</h2>
-                  <p className="mt-1 text-sm leading-5 text-slate-300">
+                  <h2 className="font-semibold text-slate-900 dark:text-white">Secure by design</h2>
+                  <p className="mt-1 text-sm leading-5 text-slate-600 dark:text-slate-300">
                     Every session requires your approval. Remote control is
                     never granted automatically.
                   </p>
@@ -492,23 +517,23 @@ export function App(): JSX.Element {
           aria-modal="true"
           aria-labelledby="connection-request-title"
         >
-          <section className="modal-in w-full max-w-md rounded-2xl border border-white/[0.1] bg-[#101b2d] p-6 shadow-elevated">
+          <section className="modal-in w-full max-w-md rounded-2xl border border-slate-200 dark:border-white/[0.1] bg-white dark:bg-[#101b2d] p-6 shadow-elevated">
             <div className="eyebrow">
               <Wifi size={13} /> CONNECTION REQUEST
             </div>
             <h2
               id="connection-request-title"
-              className="mt-4 text-xl font-semibold text-white"
+              className="mt-4 text-xl font-semibold text-slate-900 dark:text-white"
             >
               Allow this device to connect?
             </h2>
-            <p className="mt-4 text-sm leading-6 text-slate-300">
-              <span className="font-medium text-slate-100">
+            <p className="mt-4 text-sm leading-6 text-slate-600 dark:text-slate-300">
+              <span className="font-medium text-slate-900 dark:text-slate-100">
                 {signaling.incomingRequest.from.deviceName}
               </span>{" "}
               wants to connect to your device.
             </p>
-            <p className="mt-2 text-xs text-slate-400">
+            <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
               ID: {formatId(signaling.incomingRequest.from.deviceId)}
             </p>
             <div className="mt-6 flex justify-end gap-3">
@@ -539,23 +564,23 @@ export function App(): JSX.Element {
           aria-modal="true"
           aria-labelledby="screen-picker-title"
         >
-          <section className="modal-in flex max-h-[80vh] w-full max-w-3xl flex-col rounded-2xl border border-white/[0.1] bg-[#101b2d] p-6 shadow-elevated">
+          <section className="modal-in flex max-h-[80vh] w-full max-w-3xl flex-col rounded-2xl border border-slate-200 dark:border-white/[0.1] bg-white dark:bg-[#101b2d] p-6 shadow-elevated">
             <div className="eyebrow">
               <MonitorUp size={13} /> SHARE SCREEN
             </div>
             <h2
               id="screen-picker-title"
-              className="mt-4 text-xl font-semibold text-white"
+              className="mt-4 text-xl font-semibold text-slate-900 dark:text-white"
             >
               Choose what to share
             </h2>
-            <p className="mt-2 text-sm text-slate-300">
+            <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
               Select a screen or window to share with the remote device.
             </p>
             <div className="mt-5 flex min-h-0 flex-col gap-6 overflow-y-auto pr-2">
               {/* Screens Section */}
               <div>
-                <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
+                <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   Screens
                 </h3>
                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
@@ -565,14 +590,14 @@ export function App(): JSX.Element {
                       <Button
                         key={source.id}
                         onClick={() => handleSelectScreen(source.id)}
-                        className="flex flex-col items-center gap-3 rounded-xl border border-white/[0.08] bg-white/[0.02] p-3 transition-all hover:border-white/[0.15] hover:bg-white/[0.05]"
+                        className="flex flex-col items-center gap-3 rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50 dark:bg-white/[0.02] p-3 transition-all hover:border-slate-300 dark:hover:border-white/[0.15] hover:bg-slate-100 dark:hover:bg-white/[0.05]"
                       >
                         <img
                           src={source.thumbnail}
                           alt={source.name}
-                          className="aspect-video w-full rounded-lg border border-white/[0.1] bg-black/40 object-contain"
+                          className="aspect-video w-full rounded-lg border border-slate-200 dark:border-white/[0.1] bg-slate-200 dark:bg-black/40 object-contain"
                         />
-                        <span className="w-full truncate text-center text-sm font-medium text-slate-100" title={source.name || "Entire Screen"}>
+                        <span className="w-full truncate text-center text-sm font-medium text-slate-900 dark:text-slate-100" title={source.name || "Entire Screen"}>
                           {source.name || "Entire Screen"}
                         </span>
                       </Button>
@@ -582,7 +607,7 @@ export function App(): JSX.Element {
 
               {/* Windows Section */}
               <div>
-                <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
+                <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   Windows
                 </h3>
                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
@@ -592,14 +617,14 @@ export function App(): JSX.Element {
                       <Button
                         key={source.id}
                         onClick={() => handleSelectScreen(source.id)}
-                        className="flex flex-col items-center gap-3 rounded-xl border border-white/[0.08] bg-white/[0.02] p-3 transition-all hover:border-white/[0.15] hover:bg-white/[0.05]"
+                        className="flex flex-col items-center gap-3 rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50 dark:bg-white/[0.02] p-3 transition-all hover:border-slate-300 dark:hover:border-white/[0.15] hover:bg-slate-100 dark:hover:bg-white/[0.05]"
                       >
                         <img
                           src={source.thumbnail}
                           alt={source.name}
-                          className="aspect-video w-full rounded-lg border border-white/[0.1] bg-black/40 object-contain"
+                          className="aspect-video w-full rounded-lg border border-slate-200 dark:border-white/[0.1] bg-slate-200 dark:bg-black/40 object-contain"
                         />
-                        <span className="w-full truncate text-center text-sm font-medium text-slate-100" title={source.name || "Window"}>
+                        <span className="w-full truncate text-center text-sm font-medium text-slate-900 dark:text-slate-100" title={source.name || "Window"}>
                           {source.name || "Window"}
                         </span>
                       </Button>
@@ -628,22 +653,22 @@ export function App(): JSX.Element {
           aria-modal="true"
           aria-labelledby="control-request-title"
         >
-          <section className="modal-in w-full max-w-md rounded-2xl border border-rose-500/30 bg-[#101b2d] p-6 shadow-elevated">
-            <div className="eyebrow text-rose-400">
+          <section className="modal-in w-full max-w-md rounded-2xl border border-rose-500/30 bg-white dark:bg-[#101b2d] p-6 shadow-elevated">
+            <div className="eyebrow text-rose-500 dark:text-rose-400">
               <MousePointer2 size={13} /> REMOTE CONTROL REQUEST
             </div>
             <h2
               id="control-request-title"
-              className="mt-4 text-xl font-semibold text-white"
+              className="mt-4 text-xl font-semibold text-slate-900 dark:text-white"
             >
               Allow remote control?
             </h2>
-            <p className="mt-4 text-sm leading-6 text-slate-300">
+            <p className="mt-4 text-sm leading-6 text-slate-600 dark:text-slate-300">
               The remote device is requesting permission to control your mouse
               and keyboard.
             </p>
-            <div className="mt-4 rounded-xl border border-rose-500/20 bg-rose-500/10 p-3">
-              <p className="text-xs font-medium leading-relaxed text-rose-300">
+            <div className="mt-4 rounded-xl border border-rose-500/20 bg-rose-50 dark:bg-rose-500/10 p-3">
+              <p className="text-xs font-medium leading-relaxed text-rose-700 dark:text-rose-300">
                 Only grant control to people you trust. They will be able to
                 click, type, and interact with your computer as if they were
                 sitting in front of it.
@@ -673,19 +698,19 @@ export function App(): JSX.Element {
       {signaling.sessionId && !signaling.remoteStream && !screenPicker && (
         <div className="fixed bottom-6 right-6 z-40 flex flex-col items-end gap-3">
           {signaling.controlEnabled && (
-            <div className="toast-in flex items-center gap-4 rounded-2xl border border-rose-500/40 bg-rose-950/40 p-4 shadow-elevated">
+            <div className="toast-in flex items-center gap-4 rounded-2xl border border-rose-500/20 dark:border-rose-500/40 bg-white dark:bg-rose-950/40 p-4 shadow-elevated">
               <span className="relative grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-rose-500/15">
-                <MousePointer2 size={20} className="text-rose-400" />
+                <MousePointer2 size={20} className="text-rose-500 dark:text-rose-400" />
                 <span className="absolute -right-0.5 -top-0.5 flex h-2.5 w-2.5">
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-rose-400 opacity-75" />
                   <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-rose-500" />
                 </span>
               </span>
               <div>
-                <p className="text-sm font-semibold text-rose-100">
+                <p className="text-sm font-semibold text-rose-900 dark:text-rose-100">
                   Remote Control Active
                 </p>
-                <p className="text-xs text-rose-200/70">
+                <p className="text-xs text-rose-600 dark:text-rose-200/70">
                   The remote device is controlling your computer.
                 </p>
               </div>
@@ -699,17 +724,17 @@ export function App(): JSX.Element {
             </div>
           )}
 
-          <div className="toast-in flex items-center gap-4 rounded-2xl border border-emerald-500/30 bg-[#0d1624] p-4 shadow-elevated">
+          <div className="toast-in flex items-center gap-4 rounded-2xl border border-emerald-500/20 dark:border-emerald-500/30 bg-white dark:bg-[#0d1624] p-4 shadow-elevated">
             <span className="relative grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-emerald-500/15">
-              <MonitorUp size={20} className="text-emerald-400" />
+              <MonitorUp size={20} className="text-emerald-500 dark:text-emerald-400" />
               <span className="absolute -right-0.5 -top-0.5 flex h-2.5 w-2.5">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
                 <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-500" />
               </span>
             </span>
             <div>
-              <p className="text-sm font-semibold text-white">Sharing Screen</p>
-              <p className="text-xs text-slate-400">
+              <p className="text-sm font-semibold text-slate-900 dark:text-white">Sharing Screen</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 You are securely sharing your screen.
               </p>
             </div>
@@ -723,6 +748,8 @@ export function App(): JSX.Element {
           </div>
         </div>
       )}
+
+      {showSettings && <SettingsLayout onClose={() => setShowSettings(false)} />}
     </main>
   );
 }

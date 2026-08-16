@@ -78,16 +78,7 @@ button {
   }
 }
 
-/* Soft, subtle elevation (no heavy colored shadows) */
-.shadow-card {
-  box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.18),
-    0 6px 16px -6px rgba(0, 0, 0, 0.25);
-}
 
-.shadow-elevated {
-  box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.35);
-}
 
 /* Entry animations */
 @keyframes toast-in {
@@ -120,36 +111,51 @@ button {
   animation: modal-in 0.22s ease-out;
 }
 
+@keyframes settings-page-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.settings-page {
+  animation: settings-page-in 0.25s ease-out;
+}
+
 @layer components {
   /* Surface Cards */
   .surface-card {
-    @apply rounded-2xl border border-white/[0.08] bg-white/[0.03] shadow-card;
+    @apply rounded-2xl border border-slate-200 dark:border-white/[0.08] bg-white dark:bg-white/[0.03] shadow-sm dark:shadow-card;
   }
 
   .surface-card:hover {
-    @apply border-white/[0.12];
+    @apply border-slate-300 dark:border-white/[0.12];
   }
 
   /* Eyebrow */
   .eyebrow {
-    @apply flex items-center gap-2 text-[11px] font-semibold tracking-[0.14em] text-sky-300/80;
+    @apply flex items-center gap-2 text-[11px] font-semibold tracking-[0.14em] text-sky-600 dark:text-sky-300/80;
   }
 
   /* Status Pill */
   .status-pill {
-    @apply inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/[0.09] px-3 py-1.5 text-xs font-medium text-emerald-300;
+    @apply inline-flex items-center gap-2 rounded-full border border-emerald-500/20 dark:border-emerald-400/20 bg-emerald-50 dark:bg-emerald-400/[0.09] px-3 py-1.5 text-xs font-medium text-emerald-600 dark:text-emerald-300;
   }
 
   /* Icon Button */
   .icon-button {
     --ripple-color: rgba(255, 255, 255, 0.2);
-    @apply grid h-11 w-11 place-items-center rounded-xl border border-white/[0.08] bg-white/[0.04] text-slate-400 transition-all hover:bg-white/[0.08] hover:text-white hover:border-white/[0.12];
+    @apply grid h-11 w-11 place-items-center rounded-xl border border-slate-200 dark:border-white/[0.08] bg-white dark:bg-white/[0.04] text-slate-500 dark:text-slate-400 transition-all hover:bg-slate-50 dark:hover:bg-white/[0.08] hover:text-slate-900 dark:hover:text-white hover:border-slate-300 dark:hover:border-white/[0.12];
   }
 
   /* Secondary Button */
   .secondary-button {
     --ripple-color: rgba(255, 255, 255, 0.22);
-    @apply inline-flex items-center justify-center gap-2.5 rounded-xl border border-white/[0.12] bg-white/[0.06] px-4 py-2.5 text-sm font-medium text-slate-200 transition-all hover:bg-white/[0.09] hover:text-slate-50 hover:border-white/[0.16] disabled:cursor-not-allowed disabled:opacity-50;
+    @apply inline-flex items-center justify-center gap-2.5 rounded-xl border border-slate-200 dark:border-white/[0.12] bg-white dark:bg-white/[0.06] px-4 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-200 transition-all hover:bg-slate-50 dark:hover:bg-white/[0.09] hover:text-slate-900 dark:hover:text-slate-50 hover:border-slate-300 dark:hover:border-white/[0.16] disabled:cursor-not-allowed disabled:opacity-50;
   }
 
   /* Primary Button */
@@ -172,17 +178,17 @@ button {
 
   /* Input Field */
   .input-field {
-    @apply h-12 rounded-xl border border-white/[0.12] bg-slate-950/50 px-4 text-sm text-slate-50 placeholder:text-slate-400 transition-all focus:border-sky-400/60 focus:bg-slate-950/65 focus-visible:outline-none focus:ring-0;
+    @apply h-12 rounded-xl border border-slate-200 dark:border-white/[0.12] bg-white dark:bg-slate-950/50 px-4 text-sm text-slate-900 dark:text-slate-50 placeholder:text-slate-400 transition-all focus:border-sky-400/60 focus:bg-slate-50 dark:focus:bg-slate-950/65 focus-visible:outline-none focus:ring-0;
   }
 
   /* Textarea */
   .textarea-field {
-    @apply min-h-[96px] rounded-xl border border-white/[0.12] bg-slate-950/50 px-4 py-3 text-sm text-slate-50 placeholder:text-slate-400 transition-all focus:border-sky-400/60 focus:bg-slate-950/65 focus-visible:outline-none focus:ring-0 resize-none;
+    @apply min-h-[96px] rounded-xl border border-slate-200 dark:border-white/[0.12] bg-white dark:bg-slate-950/50 px-4 py-3 text-sm text-slate-900 dark:text-slate-50 placeholder:text-slate-400 transition-all focus:border-sky-400/60 focus:bg-slate-50 dark:focus:bg-slate-950/65 focus-visible:outline-none focus:ring-0 resize-none;
   }
 
   /* Select */
   .select-field {
-    @apply h-12 rounded-xl border border-white/[0.12] bg-slate-950/50 px-4 text-sm text-slate-50 placeholder:text-slate-400 transition-all focus:border-sky-400/60 focus:bg-slate-950/65 focus-visible:outline-none focus:ring-0;
+    @apply h-12 rounded-xl border border-slate-200 dark:border-white/[0.12] bg-white dark:bg-slate-950/50 px-4 text-sm text-slate-900 dark:text-slate-50 placeholder:text-slate-400 transition-all focus:border-sky-400/60 focus:bg-slate-50 dark:focus:bg-slate-950/65 focus-visible:outline-none focus:ring-0;
   }
 
   /* Button Group */

@@ -5,7 +5,6 @@ import {
   PhoneOff,
   MousePointerClick,
   MonitorUp,
-  Lock,
   Unlock,
 } from "lucide-react";
 import type { InputMessage } from "../services/remoteControl/InputProtocol";

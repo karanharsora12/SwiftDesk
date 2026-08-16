@@ -21,6 +21,17 @@ const api: SwiftDeskApi = {
     ipcRenderer.invoke(IPC_CHANNELS.saveAuthToken, token),
   clearAuthToken: () => ipcRenderer.invoke(IPC_CHANNELS.clearAuthToken),
   releaseAllKeys: () => ipcRenderer.invoke(IPC_CHANNELS.releaseAllKeys),
+  getSettings: () => ipcRenderer.invoke(IPC_CHANNELS.getSettings),
+  updateSetting: (key: string, value: any) =>
+    ipcRenderer.invoke(IPC_CHANNELS.updateSetting, key, value),
+  resetSettings: () => ipcRenderer.invoke(IPC_CHANNELS.resetSettings),
+  onSettingsChange: (callback) => {
+    const subscription = (_event: any, settings: any) => callback(settings);
+    ipcRenderer.on(IPC_CHANNELS.onSettingsChange, subscription);
+    return () => {
+      ipcRenderer.removeListener(IPC_CHANNELS.onSettingsChange, subscription);
+    };
+  },
 };
 
 contextBridge.exposeInMainWorld("swiftDesk", api);

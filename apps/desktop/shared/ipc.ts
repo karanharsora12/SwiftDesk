@@ -1,4 +1,5 @@
 import type { DeviceIdentity } from './device-identity'
+import type { SwiftDeskSettings } from './settings'
 
 export const IPC_CHANNELS = {
   getDeviceIdentity: 'identity:get',
@@ -11,6 +12,10 @@ export const IPC_CHANNELS = {
   saveAuthToken: 'auth:save-token',
   clearAuthToken: 'auth:clear-token',
   releaseAllKeys: 'remote:release-keys',
+  getSettings: 'settings:get',
+  updateSetting: 'settings:update',
+  resetSettings: 'settings:reset',
+  onSettingsChange: 'settings:on-change',
 } as const
 
 export interface ApplicationInfo {
@@ -30,4 +35,8 @@ export interface SwiftDeskApi {
   saveAuthToken(token: string): Promise<void>
   clearAuthToken(): Promise<void>
   releaseAllKeys(): Promise<void>
+  getSettings(): Promise<SwiftDeskSettings>
+  updateSetting(key: string, value: any): Promise<void>
+  resetSettings(): Promise<void>
+  onSettingsChange(callback: (settings: SwiftDeskSettings) => void): () => void
 }
