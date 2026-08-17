@@ -1,4 +1,13 @@
-import { app, BrowserWindow, desktopCapturer, ipcMain, shell, Tray, Menu, nativeTheme } from "electron";
+import {
+  app,
+  BrowserWindow,
+  desktopCapturer,
+  ipcMain,
+  shell,
+  Tray,
+  Menu,
+  nativeTheme,
+} from "electron";
 import { is } from "@electron-toolkit/utils";
 import { join } from "node:path";
 import { IPC_CHANNELS } from "../../shared/ipc";
@@ -110,10 +119,13 @@ function setupTray(): void {
   tray = new Tray(icon);
   const contextMenu = Menu.buildFromTemplate([
     { label: "Show SwiftDesk", click: () => mainWindow?.show() },
-    { label: "Quit", click: () => {
-      isQuitting = true;
-      app.quit();
-    }}
+    {
+      label: "Quit",
+      click: () => {
+        isQuitting = true;
+        app.quit();
+      },
+    },
   ]);
   tray.setToolTip("SwiftDesk");
   tray.setContextMenu(contextMenu);
@@ -150,9 +162,10 @@ function registerIpcHandlers(): void {
     return sources.map((source) => {
       let name = source.name;
       if (source.id.startsWith("screen:")) {
-        name = name.toLowerCase() === "entire screen" 
-          ? "Entire Screen" 
-          : name.replace(/^Screen/i, "Entire Screen");
+        name =
+          name.toLowerCase() === "entire screen"
+            ? "Entire Screen"
+            : name.replace(/^Screen/i, "Entire Screen");
       }
       return {
         id: source.id,
@@ -209,28 +222,34 @@ function registerIpcHandlers(): void {
     return getSettingsService().getSettings();
   });
 
-  ipcMain.handle(IPC_CHANNELS.updateSetting, (_event, key: string, value: any) => {
-    getSettingsService().updateSetting(key, value);
-    
-    // Check if we need to update tray or startup settings
-    if (key === 'general.minimizeToTray' || key === 'general.closeToTray') {
-      const settings = getSettingsService().getSettings();
-      if (settings.general.minimizeToTray || settings.general.closeToTray) {
-        setupTray();
-      } else if (tray) {
-        tray.destroy();
-        tray = undefined;
+  ipcMain.handle(
+    IPC_CHANNELS.updateSetting,
+    (_event, key: string, value: any) => {
+      getSettingsService().updateSetting(key, value);
+
+      // Check if we need to update tray or startup settings
+      if (key === "general.minimizeToTray" || key === "general.closeToTray") {
+        const settings = getSettingsService().getSettings();
+        if (settings.general.minimizeToTray || settings.general.closeToTray) {
+          setupTray();
+        } else if (tray) {
+          tray.destroy();
+          tray = undefined;
+        }
       }
-    }
-    
-    if (key === 'general.startOnStartup' || key === 'general.startMinimized') {
-      updateStartupSettings();
-    }
-    
-    if (key === 'general.theme') {
-      nativeTheme.themeSource = value || 'system';
-    }
-  });
+
+      if (
+        key === "general.startOnStartup" ||
+        key === "general.startMinimized"
+      ) {
+        updateStartupSettings();
+      }
+
+      if (key === "general.theme") {
+        nativeTheme.themeSource = value || "system";
+      }
+    },
+  );
 
   ipcMain.handle(IPC_CHANNELS.resetSettings, () => {
     getSettingsService().resetSettings();
@@ -251,7 +270,9 @@ function getDeviceIdentityService(): DeviceIdentityService {
 
 function getSettingsService(): SettingsService {
   if (!settingsService) {
-    throw new Error("Settings service was requested before the application was ready.");
+    throw new Error(
+      "Settings service was requested before the application was ready.",
+    );
   }
   return settingsService;
 }
@@ -261,12 +282,13 @@ app.whenReady().then(() => {
   const userData = app.getPath("userData");
   deviceIdentityService = new DeviceIdentityService(userData);
   settingsService = new SettingsService(userData);
-  
-  nativeTheme.themeSource = settingsService.getSettings().general.theme || "system";
-  
+
+  nativeTheme.themeSource =
+    settingsService.getSettings().general.theme || "system";
+
   updateStartupSettings();
   setupTray();
-  
+
   registerIpcHandlers();
   createWindow();
 

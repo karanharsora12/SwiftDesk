@@ -13,6 +13,8 @@ export class ScreenCaptureService {
           mandatory: {
             chromeMediaSource: 'desktop',
             chromeMediaSourceId: sourceId,
+            minFrameRate: 60,
+            maxFrameRate: 60
           }
         } as any
       });

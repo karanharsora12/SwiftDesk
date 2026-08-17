@@ -5,6 +5,11 @@ export class WindowsInputController implements INativeInputController {
   private pressedKeys = new Set<Key>();
   private pressedMouseButtons = new Set<Button>();
 
+  constructor() {
+    mouse.config.autoDelayMs = 0;
+    mouse.config.mouseSpeed = 999999;
+  }
+
   // Map incoming string keys to nut.js Key enum
   private mapKey(keyString: string): Key | null {
     const keyMap: Record<string, Key> = {

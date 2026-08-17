@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Routes, Route, useNavigate, useLocation, Navigate } from "react-router-dom";
 import {
   ArrowLeft,
   Bell,
@@ -42,34 +43,14 @@ const PREFS_TABS: Tab[] = [
 
 const ABOUT_TAB: Tab = { id: "about", label: "About", icon: Info };
 
-export function SettingsLayout({ onClose }: { onClose: () => void }) {
-  const [activeTab, setActiveTab] = useState<string>("general");
+export function SettingsLayout({ onClose, onRequestConnection }: { onClose: () => void, onRequestConnection: (id: string) => void }) {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const activeTab = location.pathname.split("/").pop() || "general";
+  
   const { resetSettings } = useSettings();
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
-
-  const renderActivePage = () => {
-    switch (activeTab) {
-      case "general":
-        return <GeneralPage />;
-      case "connection":
-        return <ConnectionPage />;
-      case "screen-sharing":
-        return <ScreenSharingPage />;
-      case "remote-control":
-        return <RemoteControlPage />;
-      case "security":
-        return <SecurityPage />;
-      case "notifications":
-        return <NotificationsPage />;
-      case "sessions":
-        return <SessionsPage />;
-      case "about":
-        return <AboutPage />;
-      default:
-        return <GeneralPage />;
-    }
-  };
 
   const renderTab = (tab: Tab) => {
     const Icon = tab.icon;
@@ -77,7 +58,7 @@ export function SettingsLayout({ onClose }: { onClose: () => void }) {
     return (
       <button
         key={tab.id}
-        onClick={() => setActiveTab(tab.id)}
+        onClick={() => navigate(`/settings/${tab.id}`)}
         className={`group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
           isActive
             ? "bg-sky-50 dark:bg-sky-400/10 text-sky-600 dark:text-sky-200"
@@ -159,7 +140,17 @@ export function SettingsLayout({ onClose }: { onClose: () => void }) {
         {/* Content */}
         <main className="flex-1 overflow-y-auto p-6 sm:p-8">
           <div key={activeTab} className="settings-page mx-auto max-w-2xl pb-8">
-            {renderActivePage()}
+            <Routes>
+              <Route path="general" element={<GeneralPage />} />
+              <Route path="connection" element={<ConnectionPage />} />
+              <Route path="screen-sharing" element={<ScreenSharingPage />} />
+              <Route path="remote-control" element={<RemoteControlPage />} />
+              <Route path="security" element={<SecurityPage />} />
+              <Route path="notifications" element={<NotificationsPage />} />
+              <Route path="sessions" element={<SessionsPage onRequestConnection={(id) => { onRequestConnection(id); onClose(); }} />} />
+              <Route path="about" element={<AboutPage />} />
+              <Route path="*" element={<Navigate to="general" replace />} />
+            </Routes>
           </div>
         </main>
       </div>

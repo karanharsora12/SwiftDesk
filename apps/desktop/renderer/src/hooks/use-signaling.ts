@@ -10,6 +10,7 @@ import { ScreenCaptureService, type ScreenSource } from "../services/screenCaptu
 
 import { RemoteControlService } from "../services/remoteControl/RemoteControlService";
 import type { InputMessage } from "../services/remoteControl/InputProtocol";
+import { addRecentSession } from "../services/recent-sessions";
 
 export interface SignalingState {
   status: ConnectionServerStatus;
@@ -47,6 +48,7 @@ export function useSignaling(device: DeviceIdentity | null, uiCallbacks?: Signal
   const iceBuffer = useRef<any[]>([]);
   const capture = useRef(new ScreenCaptureService());
   const remoteControl = useRef<RemoteControlService | null>(null);
+  const pendingTargetId = useRef<string | null>(null);
   
   const callbacksRef = useRef(uiCallbacks);
   useEffect(() => { callbacksRef.current = uiCallbacks; }, [uiCallbacks]);
@@ -86,6 +88,10 @@ export function useSignaling(device: DeviceIdentity | null, uiCallbacks?: Signal
       onIncomingRequest: setIncomingRequest,
       onAccepted: (session) => {
         setSessionId(session.sessionId);
+        if (pendingTargetId.current) {
+          addRecentSession({ deviceId: pendingTargetId.current, name: "Remote Device" });
+          pendingTargetId.current = null;
+        }
         const peer = createRtc(session.sessionId);
         void peer
           .start("controller")
@@ -174,10 +180,12 @@ export function useSignaling(device: DeviceIdentity | null, uiCallbacks?: Signal
     sessionMessage,
     requestConnection: (targetDeviceId) => {
       setSessionMessage("Connection request sent. Waiting for approval...");
+      pendingTargetId.current = targetDeviceId;
       signalingService.requestConnection(targetDeviceId);
     },
     acceptIncomingRequest: () => {
       if (!incomingRequest) return;
+      addRecentSession({ deviceId: incomingRequest.from.deviceId, name: incomingRequest.from.deviceName });
       signalingService.acceptConnection(incomingRequest.sessionId);
       setSessionMessage(
         `Connection accepted. Session ID: ${incomingRequest.sessionId}`,

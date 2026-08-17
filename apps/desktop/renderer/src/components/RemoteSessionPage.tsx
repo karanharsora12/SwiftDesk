@@ -33,6 +33,13 @@ export function RemoteSessionPage({
 }): JSX.Element {
   const video = useRef<HTMLVideoElement>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const rafRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     if (video.current) {
@@ -57,30 +64,37 @@ export function RemoteSessionPage({
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLVideoElement>) => {
-    const videoEl = video.current;
-    if (!videoEl) return;
-    const rect = videoEl.getBoundingClientRect();
-    const scaleX = videoEl.videoWidth / rect.width;
-    const scaleY = videoEl.videoHeight / rect.height;
-    const scale = Math.max(scaleX, scaleY);
-    const displayedWidth = videoEl.videoWidth / scale;
-    const displayedHeight = videoEl.videoHeight / scale;
-    const offsetX = (rect.width - displayedWidth) / 2;
-    const offsetY = (rect.height - displayedHeight) / 2;
-    const actualX = e.clientX - rect.left - offsetX;
-    const actualY = e.clientY - rect.top - offsetY;
+    if (rafRef.current !== null) return;
+    const clientX = e.clientX;
+    const clientY = e.clientY;
 
-    if (
-      actualX < 0 ||
-      actualX > displayedWidth ||
-      actualY < 0 ||
-      actualY > displayedHeight
-    )
-      return;
+    rafRef.current = requestAnimationFrame(() => {
+      rafRef.current = null;
+      const videoEl = video.current;
+      if (!videoEl) return;
+      const rect = videoEl.getBoundingClientRect();
+      const scaleX = videoEl.videoWidth / rect.width;
+      const scaleY = videoEl.videoHeight / rect.height;
+      const scale = Math.max(scaleX, scaleY);
+      const displayedWidth = videoEl.videoWidth / scale;
+      const displayedHeight = videoEl.videoHeight / scale;
+      const offsetX = (rect.width - displayedWidth) / 2;
+      const offsetY = (rect.height - displayedHeight) / 2;
+      const actualX = clientX - rect.left - offsetX;
+      const actualY = clientY - rect.top - offsetY;
 
-    const x = actualX / displayedWidth;
-    const y = actualY / displayedHeight;
-    sendRemoteInput({ type: "mouse_move", x, y });
+      if (
+        actualX < 0 ||
+        actualX > displayedWidth ||
+        actualY < 0 ||
+        actualY > displayedHeight
+      )
+        return;
+
+      const x = actualX / displayedWidth;
+      const y = actualY / displayedHeight;
+      sendRemoteInput({ type: "mouse_move", x, y });
+    });
   };
 
   const handleMouseDown = (e: React.MouseEvent<HTMLVideoElement>) => {
@@ -189,7 +203,11 @@ export function RemoteSessionPage({
           >
             {isFullscreen ? <Minimize size={16} /> : <Maximize size={16} />}
           </Button>
-          <Button variant="danger" className="px-4 py-1.5 text-xs" onClick={onDisconnect}>
+          <Button
+            variant="danger"
+            className="px-4 py-1.5 text-xs"
+            onClick={onDisconnect}
+          >
             <PhoneOff size={14} /> Disconnect
           </Button>
         </div>
@@ -213,8 +231,6 @@ export function RemoteSessionPage({
             onKeyUp={handleKeyUp}
             onContextMenu={(e) => e.preventDefault()}
           />
-
-
 
           {/* Mouse pointer overlay when viewing */}
           {!controlEnabled && (
