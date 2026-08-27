@@ -17,6 +17,7 @@
     "@electron-toolkit/utils": "^4.0.0",
     "@nut-tree-fork/nut-js": "^4.2.6",
     "@swiftdesk/types": "0.1.0",
+    "electron-updater": "^6.8.9",
     "lucide-react": "^0.468.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -50,6 +51,11 @@
         "nsis"
       ],
       "icon": "resources/icon.ico"
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "karanharsora12",
+      "repo": "SwiftDesk"
     },
     "nsis": {
       "oneClick": false,

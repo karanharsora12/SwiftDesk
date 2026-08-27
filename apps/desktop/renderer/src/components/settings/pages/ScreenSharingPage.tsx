@@ -14,10 +14,11 @@ export function ScreenSharingPage() {
         .filter((s) => s.id.startsWith("screen:"))
         .map((s) => ({ label: s.name || "Unknown Display", value: s.id }));
 
-      if (screenSources.length === 0) {
-        screenSources.push({ label: "Primary Display", value: "primary" });
-      }
-      setDisplays(screenSources);
+      setDisplays([
+        { label: "Always Ask (No Default)", value: "always-ask" },
+        { label: "Primary Display", value: "primary" }, 
+        ...screenSources
+      ]);
     });
   }, []);
 

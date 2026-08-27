@@ -1,12 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 import type { IncomingConnectionRequest } from "@swiftdesk/types";
 import type { DeviceIdentity } from "../../../shared/device-identity";
+import type { SwiftDeskSettings } from "../../../shared/settings";
 import {
   type ConnectionServerStatus,
   signalingService,
 } from "../services/signaling-service";
 import { WebRTCService } from "../services/webrtc/WebRTCService";
-import { ScreenCaptureService, type ScreenSource } from "../services/screenCapture/ScreenCaptureService";
+import {
+  ScreenCaptureService,
+  type ScreenSource,
+} from "../services/screenCapture/ScreenCaptureService";
 
 import { RemoteControlService } from "../services/remoteControl/RemoteControlService";
 import type { InputMessage } from "../services/remoteControl/InputProtocol";
@@ -32,11 +36,19 @@ export interface SignalingState {
 }
 
 export interface SignalingCallbacks {
-  onRequireScreenSelection?(sessionId: string, sdp: any, sources: ScreenSource[]): void;
+  onRequireScreenSelection?(
+    sessionId: string,
+    sdp: any,
+    sources: ScreenSource[],
+  ): void;
   onRequireControlApproval?(sessionId: string): void;
 }
 
-export function useSignaling(device: DeviceIdentity | null, uiCallbacks?: SignalingCallbacks): SignalingState {
+export function useSignaling(
+  device: DeviceIdentity | null,
+  settings: SwiftDeskSettings | null,
+  uiCallbacks?: SignalingCallbacks,
+): SignalingState {
   const [status, setStatus] = useState<ConnectionServerStatus>("offline");
   const [incomingRequest, setIncomingRequest] =
     useState<IncomingConnectionRequest | null>(null);
@@ -49,9 +61,11 @@ export function useSignaling(device: DeviceIdentity | null, uiCallbacks?: Signal
   const capture = useRef(new ScreenCaptureService());
   const remoteControl = useRef<RemoteControlService | null>(null);
   const pendingTargetId = useRef<string | null>(null);
-  
+
   const callbacksRef = useRef(uiCallbacks);
-  useEffect(() => { callbacksRef.current = uiCallbacks; }, [uiCallbacks]);
+  useEffect(() => {
+    callbacksRef.current = uiCallbacks;
+  }, [uiCallbacks]);
 
   const createRtc = (activeSessionId: string): WebRTCService => {
     const service = new WebRTCService({
@@ -85,11 +99,27 @@ export function useSignaling(device: DeviceIdentity | null, uiCallbacks?: Signal
 
     const unsubscribe = signalingService.subscribe({
       onStatusChange: setStatus,
-      onIncomingRequest: setIncomingRequest,
+      onIncomingRequest: (request) => {
+        if (settings && !settings.security.requireConnectionApproval) {
+          addRecentSession({
+            deviceId: request.from.deviceId,
+            name: request.from.deviceName,
+          });
+          signalingService.acceptConnection(request.sessionId);
+          setSessionMessage(
+            `Connection auto-accepted. Session ID: ${request.sessionId}`,
+          );
+        } else {
+          setIncomingRequest(request);
+        }
+      },
       onAccepted: (session) => {
         setSessionId(session.sessionId);
         if (pendingTargetId.current) {
-          addRecentSession({ deviceId: pendingTargetId.current, name: "Remote Device" });
+          addRecentSession({
+            deviceId: pendingTargetId.current,
+            name: "Remote Device",
+          });
           pendingTargetId.current = null;
         }
         const peer = createRtc(session.sessionId);
@@ -125,10 +155,48 @@ export function useSignaling(device: DeviceIdentity | null, uiCallbacks?: Signal
             setSessionMessage("No screens available to share.");
             return;
           }
-          if (callbacksRef.current?.onRequireScreenSelection) {
-            callbacksRef.current.onRequireScreenSelection(signal.sessionId, signal.sdp, sources);
+
+          if (settings && !settings.security.requireScreenShareApproval && settings.screenSharing.defaultDisplay !== "always-ask") {
+            let sourceId = sources[0].id;
+
+            if (settings.screenSharing.defaultDisplay === "primary") {
+              const primary = sources.find((s) => s.id.startsWith("screen:"));
+              if (primary) sourceId = primary.id;
+            } else if (settings.screenSharing.defaultDisplay === "all") {
+              const primary = sources.find((s) => s.id.startsWith("screen:"));
+              if (primary) sourceId = primary.id;
+            }
+
+            try {
+              const stream = await capture.current.capture(sourceId, settings);
+              const peer = createRtc(signal.sessionId);
+              await peer.start("host", stream);
+              await peer.acceptOffer(signal.sdp);
+              const buffered = iceBuffer.current.splice(
+                0,
+                iceBuffer.current.length,
+              );
+              for (const cand of buffered) {
+                await peer.addIceCandidate(cand);
+              }
+              setSessionMessage("Screen sharing auto-started.");
+            } catch (e) {
+              setSessionMessage(
+                e instanceof Error
+                  ? `Failed to share screen: ${e.message}`
+                  : "Failed to share screen",
+              );
+            }
           } else {
-            setSessionMessage("Screen sharing requires explicit consent UI.");
+            if (callbacksRef.current?.onRequireScreenSelection) {
+              callbacksRef.current.onRequireScreenSelection(
+                signal.sessionId,
+                signal.sdp,
+                sources,
+              );
+            } else {
+              setSessionMessage("Screen sharing requires explicit consent UI.");
+            }
           }
         })().catch((e) => {
           console.error("[ScreenCapture] Failed to list sources", e);
@@ -146,7 +214,11 @@ export function useSignaling(device: DeviceIdentity | null, uiCallbacks?: Signal
         }
       },
       onControlRequest: (signal) => {
-        if (callbacksRef.current?.onRequireControlApproval) {
+        if (settings && !settings.security.requireControlApproval) {
+          signalingService.grantControl(signal.sessionId);
+          remoteControl.current?.setEnabled(true);
+          setControlEnabled(true);
+        } else if (callbacksRef.current?.onRequireControlApproval) {
           callbacksRef.current.onRequireControlApproval(signal.sessionId);
         } else {
           signalingService.rejectControl(signal.sessionId);
@@ -185,7 +257,10 @@ export function useSignaling(device: DeviceIdentity | null, uiCallbacks?: Signal
     },
     acceptIncomingRequest: () => {
       if (!incomingRequest) return;
-      addRecentSession({ deviceId: incomingRequest.from.deviceId, name: incomingRequest.from.deviceName });
+      addRecentSession({
+        deviceId: incomingRequest.from.deviceId,
+        name: incomingRequest.from.deviceName,
+      });
       signalingService.acceptConnection(incomingRequest.sessionId);
       setSessionMessage(
         `Connection accepted. Session ID: ${incomingRequest.sessionId}`,
@@ -216,16 +291,23 @@ export function useSignaling(device: DeviceIdentity | null, uiCallbacks?: Signal
     approveScreenShare: (targetSessionId, sdp, sourceId) => {
       void (async () => {
         try {
-          const stream = await capture.current.capture(sourceId);
+          const stream = await capture.current.capture(sourceId, settings);
           const peer = createRtc(targetSessionId);
           await peer.start("host", stream);
           await peer.acceptOffer(sdp);
-          const buffered = iceBuffer.current.splice(0, iceBuffer.current.length);
+          const buffered = iceBuffer.current.splice(
+            0,
+            iceBuffer.current.length,
+          );
           for (const cand of buffered) {
             await peer.addIceCandidate(cand);
           }
         } catch (e) {
-          setSessionMessage(e instanceof Error ? `Failed to share screen: ${e.message}` : "Failed to share screen");
+          setSessionMessage(
+            e instanceof Error
+              ? `Failed to share screen: ${e.message}`
+              : "Failed to share screen",
+          );
         }
       })();
     },
@@ -243,6 +325,6 @@ export function useSignaling(device: DeviceIdentity | null, uiCallbacks?: Signal
       setControlEnabled(false);
       void (window as any).swiftDesk?.releaseAllKeys?.();
     },
-    controlEnabled
+    controlEnabled,
   };
 }

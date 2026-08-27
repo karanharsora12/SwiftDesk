@@ -51,48 +51,6 @@ export function SecurityPage() {
           ]}
         />
       </SettingsSection>
-
-      <SettingsSection
-        title="Access Control"
-        description="Manage which devices can reach you."
-      >
-        <div className="flex items-center justify-between gap-4 py-3.5">
-          <div className="flex min-w-0 items-center gap-3">
-            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-emerald-100/60 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-              <UserCheck size={16} />
-            </span>
-            <div className="min-w-0">
-              <h3 className="text-sm font-medium text-slate-800 dark:text-slate-200">
-                Trusted Devices
-              </h3>
-              <p className="mt-0.5 text-xs leading-5 text-slate-500 dark:text-slate-400">
-                Devices allowed to connect without repeated approval.
-              </p>
-            </div>
-          </div>
-          <Button variant="secondary" className="h-9 shrink-0 px-3.5 text-xs">
-            Manage
-          </Button>
-        </div>
-        <div className="flex items-center justify-between gap-4 py-3.5">
-          <div className="flex min-w-0 items-center gap-3">
-            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-rose-100/60 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400">
-              <UserX size={16} />
-            </span>
-            <div className="min-w-0">
-              <h3 className="text-sm font-medium text-slate-800 dark:text-slate-200">
-                Blocked Devices
-              </h3>
-              <p className="mt-0.5 text-xs leading-5 text-slate-500 dark:text-slate-400">
-                Devices permanently prevented from connecting.
-              </p>
-            </div>
-          </div>
-          <Button variant="secondary" className="h-9 shrink-0 px-3.5 text-xs">
-            Manage
-          </Button>
-        </div>
-      </SettingsSection>
     </div>
   );
 }

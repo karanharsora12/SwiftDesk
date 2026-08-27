@@ -4,6 +4,7 @@ import { MonitorUp, MousePointer2, Wifi } from "lucide-react";
 import type { DeviceIdentity } from "../../shared/device-identity";
 import { RemoteSessionPage } from "./components/RemoteSessionPage";
 import { useSignaling } from "./hooks/use-signaling";
+import { useSettings } from "./hooks/use-settings";
 import type { ScreenSource } from "./services/screenCapture/ScreenCaptureService";
 import { Button } from "./components/Button";
 import { SettingsLayout } from "./components/settings/SettingsLayout";
@@ -42,7 +43,9 @@ export function App(): JSX.Element {
     sessionId: string;
   } | null>(null);
 
-  const signaling = useSignaling(deviceIdentity, {
+  const { settings } = useSettings();
+
+  const signaling = useSignaling(deviceIdentity, settings, {
     onRequireScreenSelection: (sessionId, sdp, sources) => {
       setScreenPicker({ sessionId, sdp, sources });
     },
@@ -74,6 +77,20 @@ export function App(): JSX.Element {
       active = false;
     };
   }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      window.swiftDesk.checkForUpdates();
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    if (deviceIdentity && settings?.general?.deviceName && deviceIdentity.name !== settings.general.deviceName) {
+      setDeviceIdentity({ ...deviceIdentity, name: settings.general.deviceName });
+    }
+  }, [settings?.general?.deviceName, deviceIdentity]);
 
   const handleCopy = async (): Promise<void> => {
     if (!deviceIdentity) return;

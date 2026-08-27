@@ -161,7 +161,7 @@ export function Select({
           <div
             role="listbox"
             aria-label={label}
-            className="animate-dropdown-in origin-top [scrollbar-width:thin] [scrollbar-color:theme(colors.slate.400/40)_transparent] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-400/30 hover:[&::-webkit-scrollbar-thumb]:bg-slate-400/50 absolute z-10 mt-1.5 max-h-60 w-full overflow-y-auto rounded-xl border border-slate-200 dark:border-white/[0.1] bg-white dark:bg-[#1a2332] p-1.5 shadow-lg shadow-slate-900/10 dark:shadow-black/40"
+            className="animate-dropdown-in origin-top absolute z-10 mt-1.5 max-h-60 w-full overflow-y-auto rounded-xl border border-slate-200 dark:border-white/[0.1] bg-white dark:bg-[#1a2332] p-1.5 shadow-lg shadow-slate-900/10 dark:shadow-black/40"
           >
             {options.map((opt, i) => {
               const isSelected = opt.value === value;

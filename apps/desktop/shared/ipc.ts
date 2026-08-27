@@ -16,6 +16,12 @@ export const IPC_CHANNELS = {
   updateSetting: 'settings:update',
   resetSettings: 'settings:reset',
   onSettingsChange: 'settings:on-change',
+
+  // Updater
+  checkForUpdates: 'updater:check',
+  downloadUpdate: 'updater:download',
+  installUpdate: 'updater:install',
+  onUpdaterEvent: 'updater:on-event',
 } as const
 
 export interface ApplicationInfo {
@@ -39,4 +45,10 @@ export interface SwiftDeskApi {
   updateSetting(key: string, value: any): Promise<void>
   resetSettings(): Promise<void>
   onSettingsChange(callback: (settings: SwiftDeskSettings) => void): () => void
+
+  // Updater
+  checkForUpdates(): Promise<void>
+  downloadUpdate(): Promise<void>
+  installUpdate(): Promise<void>
+  onUpdaterEvent(callback: (event: { type: 'checking' | 'available' | 'not-available' | 'progress' | 'downloaded' | 'error', data?: any }) => void): () => void
 }

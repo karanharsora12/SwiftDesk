@@ -32,6 +32,16 @@ const api: SwiftDeskApi = {
       ipcRenderer.removeListener(IPC_CHANNELS.onSettingsChange, subscription);
     };
   },
+  checkForUpdates: () => ipcRenderer.invoke(IPC_CHANNELS.checkForUpdates),
+  downloadUpdate: () => ipcRenderer.invoke(IPC_CHANNELS.downloadUpdate),
+  installUpdate: () => ipcRenderer.invoke(IPC_CHANNELS.installUpdate),
+  onUpdaterEvent: (callback) => {
+    const subscription = (_event: any, data: any) => callback(data);
+    ipcRenderer.on(IPC_CHANNELS.onUpdaterEvent, subscription);
+    return () => {
+      ipcRenderer.removeListener(IPC_CHANNELS.onUpdaterEvent, subscription);
+    };
+  },
 };
 
 contextBridge.exposeInMainWorld("swiftDesk", api);

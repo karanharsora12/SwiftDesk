@@ -2,6 +2,7 @@ import { Button } from "../../Button";
 import { ExternalLink, RefreshCw } from "lucide-react";
 import { useEffect, useState } from "react";
 import iconUrl from "../../../../../resources/icon.png";
+import { useUpdater } from "../../../hooks/use-updater";
 
 const RESOURCES = ["SwiftDesk Website", "Privacy Policy", "Terms of Service"];
 
@@ -10,6 +11,8 @@ export function AboutPage() {
     name: "SwiftDesk",
     version: "Loading...",
   });
+
+  const { updaterState, checkForUpdates, downloadUpdate, installUpdate } = useUpdater();
 
   useEffect(() => {
     window.swiftDesk.getApplicationInfo().then((info) => {
@@ -35,10 +38,42 @@ export function AboutPage() {
           Version {appInfo.version}
         </p>
         <div className="mt-8">
-          <Button variant="primary">
-            <RefreshCw size={16} />
-            Check for Updates
-          </Button>
+          {updaterState.status === 'idle' || updaterState.status === 'not-available' ? (
+            <Button variant="primary" onClick={checkForUpdates}>
+              <RefreshCw size={16} />
+              Check for Updates
+            </Button>
+          ) : updaterState.status === 'checking' ? (
+            <Button variant="primary" disabled>
+              <RefreshCw size={16} className="animate-spin" />
+              Checking...
+            </Button>
+          ) : updaterState.status === 'available' ? (
+            <Button variant="primary" onClick={downloadUpdate}>
+              Download Update
+            </Button>
+          ) : updaterState.status === 'downloading' ? (
+            <Button variant="primary" disabled>
+              Downloading {Math.round(updaterState.progress?.percent || 0)}%
+            </Button>
+          ) : updaterState.status === 'downloaded' ? (
+            <Button variant="primary" onClick={installUpdate}>
+              Install Update
+            </Button>
+          ) : updaterState.status === 'error' ? (
+            <div className="flex flex-col items-center gap-2">
+              <span className="text-xs text-rose-500">Update failed</span>
+              <Button variant="secondary" onClick={checkForUpdates}>
+                <RefreshCw size={16} />
+                Try Again
+              </Button>
+            </div>
+          ) : null}
+          {updaterState.status === 'not-available' && (
+            <p className="mt-2 text-xs text-emerald-500 dark:text-emerald-400">
+              You're up to date!
+            </p>
+          )}
         </div>
       </section>
 

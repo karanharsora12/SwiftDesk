@@ -1,11 +1,12 @@
 import { Settings } from "lucide-react";
-import { DeviceCard } from "./DeviceCard";
-import { ConnectCard } from "./ConnectCard";
-import { QuickActions } from "./QuickActions";
-import { SecurityPanel } from "./SecurityPanel";
-import { Button } from "../Button";
 import iconUrl from "../../../../resources/icon.png";
 import type { DeviceIdentity } from "../../../../shared/device-identity";
+import { Button } from "../Button";
+import { ConnectCard } from "./ConnectCard";
+import { DeviceCard } from "./DeviceCard";
+import { QuickActions } from "./QuickActions";
+import { SecurityPanel } from "./SecurityPanel";
+import { useUpdater } from "../../hooks/use-updater";
 
 interface ApplicationInfo {
   name: string;
@@ -47,6 +48,8 @@ export function Home({
   onQuickAction,
   onOpenSettings,
 }: HomeProps) {
+  const { updaterState, downloadUpdate, installUpdate } = useUpdater();
+
   return (
     <div className="mx-auto flex h-full max-w-[1680px] flex-col px-4 py-5 sm:px-6 lg:px-8">
       <header className="flex items-center justify-between border-b border-slate-200 dark:border-white/[0.06] pb-4">
@@ -57,10 +60,39 @@ export function Home({
             className="h-10 w-10 rounded-xl border border-slate-200 dark:border-white/[0.08]"
           />
           <div>
-            <p className="text-lg font-semibold tracking-tight text-slate-900 dark:text-white">
-              {application.name}
-            </p>
+            <div className="flex items-center gap-2">
+              <p className="text-lg font-semibold tracking-tight text-slate-900 dark:text-white">
+                {application.name}
+              </p>
+              <span className="rounded-md bg-slate-100 dark:bg-white/5 px-2 py-0.5 text-xs font-medium text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-white/10">
+                v{application.version}
+              </span>
+            </div>
             <p className="text-xs text-slate-400">Fast, secure remote access</p>
+            {updaterState.status === "available" && (
+              <button
+                onClick={downloadUpdate}
+                className="mt-1 text-xs text-sky-500 hover:text-sky-600 dark:text-sky-400 dark:hover:text-sky-300 font-medium underline"
+              >
+                Update available. Click to download.
+              </button>
+            )}
+            {updaterState.status === "downloading" && (
+              <div className="mt-1 flex items-center gap-2">
+                <span className="text-xs text-sky-500 dark:text-sky-400">
+                  Downloading update:{" "}
+                  {Math.round(updaterState.progress?.percent || 0)}%
+                </span>
+              </div>
+            )}
+            {updaterState.status === "downloaded" && (
+              <button
+                onClick={installUpdate}
+                className="mt-1 text-xs text-emerald-500 hover:text-emerald-600 dark:text-emerald-400 dark:hover:text-emerald-300 font-medium underline"
+              >
+                Update ready. Click to install.
+              </button>
+            )}
           </div>
         </div>
         <div className="flex items-center gap-2.5">

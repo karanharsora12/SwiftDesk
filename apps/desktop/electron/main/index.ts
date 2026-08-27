@@ -13,6 +13,7 @@ import { join } from "node:path";
 import { IPC_CHANNELS } from "../../shared/ipc";
 import { DeviceIdentityService } from "./services/device-identity-service";
 import { SettingsService } from "./services/settings-service";
+import { UpdaterService } from "./services/updater-service";
 import { WindowsInputController } from "./services/nativeInput/windows/WindowsInputController";
 // @ts-ignore
 import icon from "../../resources/icon.ico?asset";
@@ -34,6 +35,7 @@ if (process.env.SWIFT_DESK_INSTANCE) {
 let mainWindow: BrowserWindow | undefined;
 let deviceIdentityService: DeviceIdentityService | undefined;
 let settingsService: SettingsService | undefined;
+let updaterService: UpdaterService | undefined;
 let selectedScreenSourceId: string | undefined;
 let tray: Tray | undefined;
 let isQuitting = false;
@@ -59,6 +61,7 @@ function createWindow(): void {
   });
 
   const settings = getSettingsService().getSettings();
+  getUpdaterService().setMainWindow(mainWindow);
 
   mainWindow.once("ready-to-show", () => {
     if (!settings.general.startMinimized) {
@@ -67,7 +70,8 @@ function createWindow(): void {
   });
 
   mainWindow.on("close", (event: Electron.Event) => {
-    if (!isQuitting && settings.general.closeToTray) {
+    const currentSettings = getSettingsService().getSettings();
+    if (!isQuitting && currentSettings.general.closeToTray) {
       event.preventDefault();
       mainWindow?.hide();
     }
@@ -75,7 +79,8 @@ function createWindow(): void {
 
   // @ts-ignore
   mainWindow.on("minimize", (event: any) => {
-    if (settings.general.minimizeToTray) {
+    const currentSettings = getSettingsService().getSettings();
+    if (currentSettings.general.minimizeToTray) {
       event.preventDefault();
       mainWindow?.hide();
     }
@@ -148,9 +153,14 @@ function registerIpcHandlers(): void {
     version: app.getVersion(),
     platform: process.platform,
   }));
-  ipcMain.handle(IPC_CHANNELS.getDeviceIdentity, () =>
-    getDeviceIdentityService().getIdentity(),
-  );
+  ipcMain.handle(IPC_CHANNELS.getDeviceIdentity, async () => {
+    const identity = await getDeviceIdentityService().getIdentity();
+    const settings = getSettingsService().getSettings();
+    return {
+      ...identity,
+      name: settings.general?.deviceName || identity.name
+    };
+  });
   ipcMain.handle(IPC_CHANNELS.regenerateDeviceIdentity, () =>
     getDeviceIdentityService().regenerateDeviceId(),
   );
@@ -190,6 +200,13 @@ function registerIpcHandlers(): void {
 
   ipcMain.handle(IPC_CHANNELS.sendRemoteInput, async (_event, input: any) => {
     try {
+      const settings = getSettingsService().getSettings();
+      const isMouse = ["mouse_move", "mouse_click", "mouse_down", "mouse_up", "mouse_wheel"].includes(input.type);
+      const isKeyboard = ["key_down", "key_up"].includes(input.type);
+
+      if (isMouse && !settings.remoteControl.allowMouse) return;
+      if (isKeyboard && !settings.remoteControl.allowKeyboard) return;
+
       if (input.type === "mouse_move") {
         await inputController.moveMouse(input.x, input.y);
       } else if (input.type === "mouse_click") {
@@ -256,6 +273,8 @@ function registerIpcHandlers(): void {
     updateStartupSettings();
     setupTray(); // Will remove tray if defaults say so
   });
+
+  getUpdaterService().registerIpcHandlers();
 }
 
 function getDeviceIdentityService(): DeviceIdentityService {
@@ -277,11 +296,21 @@ function getSettingsService(): SettingsService {
   return settingsService;
 }
 
+function getUpdaterService(): UpdaterService {
+  if (!updaterService) {
+    throw new Error(
+      "Updater service was requested before the application was ready.",
+    );
+  }
+  return updaterService;
+}
+
 app.whenReady().then(() => {
   app.setAppUserModelId("com.swiftdesk.desktop");
   const userData = app.getPath("userData");
   deviceIdentityService = new DeviceIdentityService(userData);
   settingsService = new SettingsService(userData);
+  updaterService = new UpdaterService();
 
   nativeTheme.themeSource =
     settingsService.getSettings().general.theme || "system";

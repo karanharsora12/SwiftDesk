@@ -5,7 +5,6 @@ import {
   type CSSProperties,
   type MouseEvent,
 } from "react";
-import exeUrl from "./assets/SwiftDesk Setup 0.1.0.exe?url";
 
 /* ----------------------------- Icons ----------------------------- */
 const DownloadIcon = () => (
@@ -265,6 +264,45 @@ const ActivityIcon = () => (
 
 
 /* --------------------------- Hooks --------------------------- */
+interface ReleaseInfo {
+  url: string;
+  version: string;
+  loading: boolean;
+}
+
+function useLatestRelease(): ReleaseInfo {
+  const [info, setInfo] = useState<ReleaseInfo>({
+    url: "#",
+    version: "v0.1.0",
+    loading: true
+  });
+
+  useEffect(() => {
+    fetch("https://api.github.com/repos/karanharsora12/SwiftDesk/releases/latest")
+      .then(res => res.json())
+      .then(data => {
+        if (data.assets && data.assets.length > 0) {
+          const exeAsset = data.assets.find((a: any) => a.name.endsWith('.exe'));
+          if (exeAsset) {
+            setInfo({
+              url: exeAsset.browser_download_url,
+              version: data.tag_name || "v0.1.0",
+              loading: false
+            });
+            return;
+          }
+        }
+        setInfo(prev => ({ ...prev, loading: false }));
+      })
+      .catch(err => {
+        console.error("Failed to fetch latest release", err);
+        setInfo(prev => ({ ...prev, loading: false }));
+      });
+  }, []);
+
+  return info;
+}
+
 function useReveal<T extends HTMLElement>() {
   const ref = useRef<T>(null);
   const [visible, setVisible] = useState(false);
@@ -336,7 +374,7 @@ const NAV_LINKS = [
   { href: "#how", label: "How it works" },
 ];
 
-function Header({ onNavigate }: { onNavigate: (href: string) => void }) {
+function Header({ onNavigate, release }: { onNavigate: (href: string) => void, release: ReleaseInfo }) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -390,12 +428,12 @@ function Header({ onNavigate }: { onNavigate: (href: string) => void }) {
 
         <div className="flex items-center gap-2 sm:gap-3">
           <a
-            href={exeUrl}
-            download="SwiftDesk Setup 0.1.0.exe"
+            href={release.url}
+            download
             className="px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl bg-white text-slate-900 hover:bg-slate-200 text-xs sm:text-sm font-bold transition-all shadow-[0_0_20px_rgba(255,255,255,0.2)] whitespace-nowrap"
           >
-            <span className="hidden sm:inline">Download Free</span>
-            <span className="sm:hidden">Download</span>
+            <span className="hidden sm:inline">{release.loading ? "Loading..." : "Download Free"}</span>
+            <span className="sm:hidden">{release.loading ? "..." : "Download"}</span>
           </a>
           <button
             onClick={() => setOpen((v) => !v)}
@@ -431,7 +469,7 @@ function Header({ onNavigate }: { onNavigate: (href: string) => void }) {
   );
 }
 
-function Hero() {
+function Hero({ release }: { release: ReleaseInfo }) {
   const [copied, setCopied] = useState(false);
   const SWIFT_ID = "842 194 021";
   const { ref, style, onMouseMove, onMouseLeave } = useTilt<HTMLDivElement>(10);
@@ -453,7 +491,7 @@ function Hero() {
         <div className="relative z-10 flex flex-col items-center lg:items-start text-center lg:text-left">
           <div className="inline-flex items-center justify-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold mb-8 backdrop-blur-md">
             <span className="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-            SwiftDesk v0.1.0 is now live
+            SwiftDesk {release.version} is now live
           </div>
 
           <h1 className="text-4xl sm:text-5xl xl:text-6xl font-bold tracking-tight leading-[1.08] mb-6">
@@ -470,12 +508,12 @@ function Hero() {
 
           <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 w-full sm:w-auto">
             <a
-              href={exeUrl}
-              download="SwiftDesk Setup 0.1.0.exe"
+              href={release.url}
+              download
               className="w-full sm:w-auto group relative flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-primary text-slate-950 font-bold text-lg transition-all hover:scale-105 active:scale-95"
             >
               <span className="absolute inset-0 bg-white/20 rounded-xl blur opacity-0 group-hover:opacity-100 transition-opacity"></span>
-              <DownloadIcon /> Download for Windows
+              <DownloadIcon /> {release.loading ? "Loading..." : "Download for Windows"}
             </a>
             <a
               href="#how"
@@ -583,7 +621,7 @@ function Hero() {
                         This Device
                       </p>
                       <p className="text-[11px] text-slate-500">
-                        Windows 11 · SwiftDesk 0.1.0
+                        Windows 11 · SwiftDesk {release.version.replace(/^v/, '')}
                       </p>
                     </div>
                   </div>
@@ -801,7 +839,7 @@ function HowItWorks() {
   );
 }
 
-function CallToAction() {
+function CallToAction({ release }: { release: ReleaseInfo }) {
   const { ref, visible } = useReveal<HTMLDivElement>();
   return (
     <section className="py-24 text-center">
@@ -823,11 +861,11 @@ function CallToAction() {
             feels like. It's completely free for personal use.
           </p>
           <a
-            href={exeUrl}
-            download="SwiftDesk Setup 0.1.0.exe"
+            href={release.url}
+            download
             className="inline-flex items-center justify-center gap-3 px-10 py-5 rounded-2xl bg-white text-slate-900 font-bold text-xl transition-all shadow-[0_0_40px_rgba(255,255,255,0.2)] hover:shadow-[0_0_60px_rgba(255,255,255,0.4)] hover:scale-105 active:scale-95"
           >
-            Download SwiftDesk
+            {release.loading ? "Loading..." : "Download SwiftDesk"}
             <ArrowRight />
           </a>
         </div>
@@ -889,6 +927,8 @@ function BackToTop() {
 }
 
 function App() {
+  const release = useLatestRelease();
+
   const navigate = (href: string) => {
     const el = document.querySelector(href);
     if (el) el.scrollIntoView({ behavior: "smooth" });
@@ -903,13 +943,13 @@ function App() {
         <div className="absolute top-0 left-0 w-full h-[800px] bg-grid-pattern opacity-40 [mask-image:linear-gradient(to_bottom,white,transparent)]"></div>
       </div>
 
-      <Header onNavigate={navigate} />
+      <Header onNavigate={navigate} release={release} />
 
       <main className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 pt-32 md:pt-40">
-        <Hero />
+        <Hero release={release} />
         <Features />
         <HowItWorks />
-        <CallToAction />
+        <CallToAction release={release} />
         <Footer />
       </main>
 

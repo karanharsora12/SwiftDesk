@@ -221,7 +221,7 @@ export function RemoteSessionPage({
             autoPlay
             playsInline
             muted
-            className="h-full w-full cursor-none object-contain outline-none"
+            className="h-full w-full object-contain outline-none cursor-default"
             tabIndex={0}
             onMouseMove={handleMouseMove}
             onMouseDown={handleMouseDown}
@@ -231,16 +231,6 @@ export function RemoteSessionPage({
             onKeyUp={handleKeyUp}
             onContextMenu={(e) => e.preventDefault()}
           />
-
-          {/* Mouse pointer overlay when viewing */}
-          {!controlEnabled && (
-            <div className="pointer-events-none absolute inset-0">
-              <div
-                className="absolute bg-[url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2220%22 height=%2220%22><path d=%22M10 0L15 5L20 5L12 9L17 14L10 11L3 14L8 9L0 5L5 5Z fill=%22%2338bdf8%22/%3E</svg>')] bg-contain bg-no-repeat"
-                style={{ width: "20px", height: "20px" }}
-              ></div>
-            </div>
-          )}
         </div>
       </section>
     </main>
